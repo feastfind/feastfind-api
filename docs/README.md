@@ -4,135 +4,155 @@
 
 ```mermaid
 erDiagram
-    USER {
-        UUID USER_ID PK
-        VARCHAR(255) USERNAME
-        VARCHAR(255) EMAIL
-        VARCHAR(255) PASSWORD_HASH
-        VARCHAR(100) LOCATION
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    FAVORITE_DISH {
-        UUID FAVORITE_DISH_ID PK
-        UUID USER_ID FK
-        UUID DISH_ID FK
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    FAVORITE_ESTABLISHMENT {
-        UUID FAVORITE_ESTABLISHMENT_ID PK
-        UUID USER_ID FK
-        UUID ESTABLISHMENT_ID FK
-        DATE CREATED_AT
-        DATE UPDATED_AT
+    User {
+        string id
+        string username
+        string email
+        string passwordHash
+        string cityId
+        datetime createdAt
+        datetime updatedAt
     }
 
-    DISH {
-        UUID DISH_ID PK
-        UUID TAG_ID FK
-        UUID ESTABLISHMENT_ID FK
-        VARCHAR(255) NAME
-        TEXT DESCRIPTION
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    DISH_REVIEW {
-        UUID DISH_REVIEW_ID PK
-        UUID USER_ID FK
-        UUID DISH_ID FK
-        UUID ESTABLISHMENT_ID FK
-        INT RATING
-        TEXT COMMENT
-        TIMESTAMP REVIEW_DATE
-        INT LIKES_COUNT
-        DATE CREATED_AT
-        DATE UPDATED_AT
+    Favorite {
+        string id
+        string type
+        string userId
+        datetime createdAt
+        datetime updatedAt
     }
 
-    STATE {
-        UUID STATE_ID PK
-        VARCHAR(100) NAME
-        FLOAT LATITUDE
-        FLOAT LONGITUDE
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    CITY {
-        UUID CITY_ID PK
-        UUID STATE_ID FK
-        VARCHAR(100) NAME
-        FLOAT LATITUDE
-        FLOAT LONGITUDE
-        DATE CREATED_AT
-        DATE UPDATED_AT
+    Dish {
+        string id
+        string name
+        string description
+        string likeCountId
+        string placeId
+        datetime createdAt
+        datetime updatedAt
     }
 
-    ESTABLISHMENT {
-        UUID ESTABLISHMENT_ID PK
-        UUID CITY_ID FK
-        UUID TAG_ID FK
-        VARCHAR(255) NAME
-        TEXT DESCRIPTION
-        VARCHAR(100) LOCATION
-        FLOAT LATITUDE
-        FLOAT LONGITUDE
-        VARCHAR(255) LINK
-        VARCHAR(50) OPEN_HOURS
-        VARCHAR(50) CLOSING_HOURS
-        INT MIN_PRICE_RANGE
-        INT MAX_PRICE_RANGE
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    ESTABLISHMENT_REVIEW {
-        UUID REVIEW_ID PK
-        UUID USER_ID FK
-        UUID ESTABLISHMENT_ID FK
-        INT RATING
-        TEXT COMMENT
-        TIMESTAMP REVIEW_DATE
-        INT LIKES_COUNT
-        DATE CREATED_AT
-        DATE UPDATED_AT
+    Place {
+        string id
+        string name
+        string description
+        string address
+        float latitude
+        float longitude
+        string likeCountId
+        string priceRangeId
+        string cityId
+        datetime createdAt
+        datetime updatedAt
     }
 
-    TAGS {
-        UUID TAG_ID PK
-        VARCHAR(100) NAME
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    DISH_TAGS {
-        UUID DISH_TAGS_ID PK
-        UUID DISH_ID FK
-        UUID TAG_ID FK
-        DATE CREATED_AT
-        DATE UPDATED_AT
-    }
-    ESTABLISHMENT_TAGS {
-        UUID ESTABLISHMENT_TAGS_ID PK
-        UUID ESTABLISHMENT_ID FK
-        UUID TAG_ID FK
-        DATE CREATED_AT
-        DATE UPDATED_AT
+    PlaceSocialMedia {
+        string id
+        string website
+        string instagram
+        string facebook
+        string placeId
+        datetime createdAt
+        datetime updatedAt
     }
 
-    USER ||--o| FAVORITE_DISH : "Favorites"
-    USER ||--o| FAVORITE_ESTABLISHMENT : "Favorites"
-    USER ||--o| DISH_REVIEW : "Writes"
-    USER ||--o| ESTABLISHMENT_REVIEW : "Writes"
+    PlaceOperatingHour {
+        string id
+        string day
+        datetime openingTime
+        datetime closingTime
+        string placeId
+        datetime createdAt
+        datetime updatedAt
+    }
 
-    DISH ||--o| DISH_REVIEW : "Has"
-    DISH ||--o| DISH_TAGS : "Has"
-    DISH_TAGS ||--o| TAGS : "Tagged with"
+    PlacePriceRange {
+        string id
+        int min
+        int max
+        datetime createdAt
+        datetime updatedAt
+    }
 
-    ESTABLISHMENT ||--o| ESTABLISHMENT_REVIEW : "Has"
-    ESTABLISHMENT ||--o| DISH : "Offers"
-    ESTABLISHMENT ||--o| CITY : "Located in"
-    ESTABLISHMENT ||--o| TAGS : "Has"
-    ESTABLISHMENT ||--o| STATE : "Located in"
-    ESTABLISHMENT_TAGS ||--o| TAGS : "Tagged with"
-    
-    CITY ||--o| STATE : "Has"
+    Review {
+        string id
+        string type
+        int rating
+        string comment
+        datetime reviewDate
+        boolean isPublished
+        string likesCountId
+        string userId
+        string dishId
+        string placeId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    LikeCount {
+        string id
+        string type
+        int likes
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TagMapping {
+        string id
+        string type
+        string tagId
+        string dishId
+        string placeId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Tags {
+        string id
+        string name
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    City {
+        string id
+        string name
+        float latitude
+        float longitude
+        string stateId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    State {
+        string id
+        string name
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    User ||--o| Favorite : "has"
+    User ||--o| Review : "writes"
+    User ||--|{ City : "lives in"
+    Favorite }|--|| User : "belongs to"
+    Dish ||--o| LikeCount : "has"
+    Dish ||--o| TagMapping : "is tagged by"
+    Dish ||--|{ Review : "has"
+    Dish }|--|| Place : "located in"
+    Place ||--o| LikeCount : "has"
+    Place ||--o| PlaceOperatingHour : "has"
+    Place ||--o| PlaceSocialMedia : "has"
+    Place ||--o| TagMapping : "is tagged by"
+    Place ||--|{ Review : "has"
+    Place }|--|{ City : "is in"
+    PlacePriceRange ||--o| Place : "ranges"
+    Review ||--o| LikeCount : "has"
+    Review ||--|{ User : "written by"
+    Review }|--|| Dish : "reviews"
+    Review }|--|| Place : "reviews"
+    TagMapping ||--|{ Tags : "references"
+    Tags ||--o| TagMapping : "is mapped to"
+    City ||--|{ Place : "has"
+    City ||--|{ User : "has"
+    State ||--|{ City : "contains"
 ```

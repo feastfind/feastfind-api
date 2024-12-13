@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Type {
+  DISH
+  PLACE
+}
+
+model User {
+  id           String @id @default(cuid())
+  username     String @unique @db.VarChar(100)
+  email        String @unique @db.VarChar(255)
+  passwordHash String @db.VarChar(255)
+
+  cityId String?
+  city   City?   @relation(fields: [cityId], references: [id])
+
+  favorites Favorite[]
+  reviews   Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  id   String @id @default(cuid())
+  type Type
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Dish {
+  id          String  @id @default(cuid())
+  name        String  @db.VarChar(255)
+  description String? @db.Text
+
+  likeCountId String    @unique
+  likesCount  LikeCount @relation(fields: [likeCountId], references: [id])
+
+  placeId String
+  place   Place  @relation(fields: [placeId], references: [id])
+
+  tags    TagMapping[]
+  reviews Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Place {
+  id          String  @id @default(cuid())
+  name        String  @db.VarChar(255)
+  description String? @db.Text
+  address     String  @db.Text
+  latitude    Float
+  longitude   Float
+
+  likeCountId String    @unique
+  likesCount  LikeCount @relation(fields: [likeCountId], references: [id])
+
+  priceRangeId String?
+  priceRange   PlacePriceRange? @relation(fields: [priceRangeId], references: [id])
+
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id])
+
+  dishes         Dish[]
+  operatingHours PlaceOperatingHour[]
+  tags           TagMapping[]
+  reviews        Review[]
+  socialMedia    PlaceSocialMedia[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PlaceSocialMedia {
+  id        String  @id @default(cuid())
+  website   String? @db.VarChar(255)
+  instagram String? @db.VarChar(255)
+  facebook  String? @db.VarChar(255)
+
+  placeId String
+  place   Place  @relation(fields: [placeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PlaceOperatingHour {
+  id          String   @id @default(cuid())
+  day         String   @db.VarChar(100)
+  openingTime DateTime @db.Time()
+  closingTime DateTime @db.Time()
+
+  placeId String
+  place   Place  @relation(fields: [placeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PlacePriceRange {
+  id  String @id @default(cuid())
+  min Int
+  max Int
+
+  places Place[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  type        Type
+  rating      Int
+  comment     String?  @db.Text
+  reviewDate  DateTime
+  isPublished Boolean  @default(false)
+
+  likesCountId String    @unique
+  likesCount   LikeCount @relation(fields: [likesCountId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  dishId String?
+  Dish   Dish?   @relation(fields: [dishId], references: [id])
+
+  placeId String?
+  Place   Place?  @relation(fields: [placeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LikeCount {
+  id    String @id @default(cuid())
+  type  Type
+  likes Int    @default(0)
+
+  Dish   Dish?
+  Place  Place?
+  Review Review?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TagMapping {
+  id   String @id @default(cuid())
+  type Type
+
+  tagId String
+  tag   Tags   @relation(fields: [tagId], references: [id])
+
+  Dish   Dish?   @relation(fields: [dishId], references: [id])
+  dishId String?
+
+  Place   Place?  @relation(fields: [placeId], references: [id])
+  placeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tags {
+  id   String @id @default(cuid())
+  name String @db.VarChar(100)
+
+  mappings TagMapping[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model City {
+  id        String @id @default(cuid())
+  name      String @db.VarChar(255)
+  latitude  Float
+  longitude Float
+
+  users  User[]
+  places Place[]
+
+  stateId String
+  state   State  @relation(fields: [stateId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model State {
+  id   String @id @default(cuid())
+  name String @db.VarChar(100)
+
+  cities City[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
