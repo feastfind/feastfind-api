@@ -126,7 +126,6 @@ model Review {
   type        Type
   rating      Int
   comment     String?  @db.Text
-  reviewDate  DateTime
   isPublished Boolean  @default(false)
 
   likesCountId String    @unique

@@ -98,7 +98,6 @@ CREATE TABLE "Review" (
     "type" "Type" NOT NULL,
     "rating" INTEGER NOT NULL,
     "comment" TEXT,
-    "reviewDate" TIMESTAMP(3) NOT NULL,
     "isPublished" BOOLEAN NOT NULL DEFAULT false,
     "likesCountId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
