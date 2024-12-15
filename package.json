@@ -19,8 +19,10 @@
   "dependencies": {
     "@hono/zod-openapi": "^0.18.3",
     "@prisma/client": "^6.0.1",
+    "@scalar/hono-api-reference": "^0.5.164",
     "hono": "^4.6.13",
-    "zod": "^3.24.0"
+    "zod": "^3.24.0",
+    "zod-prisma-types": "^3.2.1"
   },
   "devDependencies": {
     "@types/bun": "latest",
