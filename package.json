@@ -1,5 +1,7 @@
 {
   "name": "feastfind-api",
+  "private": "true",
+  "type": "module",
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --hot src/index.ts",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "prettier-plugin-prisma": "^5.0.0",
     "prisma": "^6.0.1"
   }
 }
