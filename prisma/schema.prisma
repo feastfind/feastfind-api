@@ -1,188 +1,107 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
 
 generator zod {
   provider = "zod-prisma-types"
 }
 
-enum Type {
-  DISH
-  PLACE
-}
-
 model User {
-  id           String @id @default(cuid())
-  username     String @unique @db.VarChar(100)
-  email        String @unique @db.VarChar(255)
-  passwordHash String @db.VarChar(255)
+  id String @id @default(cuid())
 
-  cityId String?
-  city   City?   @relation(fields: [cityId], references: [id])
+  name      String  @db.VarChar(100)
+  username  String  @unique @db.VarChar(100)
+  email     String  @unique @db.VarChar(255)
+  avatarURL String? @db.Text
 
-  favorites Favorite[]
-  reviews   Review[]
+  password Password?
+
+  places         Place[]
+  menuItems      MenuItem[]
+  menuItemReview MenuItemReview[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Favorite {
-  id   String @id @default(cuid())
-  type Type
-
-  userId String
+model Password {
+  id     String @id @default(cuid())
+  hash   String @unique
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Dish {
-  id          String  @id @default(cuid())
-  name        String  @db.VarChar(255)
-  description String? @db.Text
-
-  likeCountId String    @unique
-  likesCount  LikeCount @relation(fields: [likeCountId], references: [id])
-
-  placeId String
-  place   Place  @relation(fields: [placeId], references: [id])
-
-  tags    TagMapping[]
-  reviews Review[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Place {
-  id          String  @id @default(cuid())
+  id String @id @default(cuid())
+
   name        String  @db.VarChar(255)
   description String? @db.Text
-  address     String  @db.Text
-  latitude    Float
-  longitude   Float
 
-  likeCountId String    @unique
-  likesCount  LikeCount @relation(fields: [likeCountId], references: [id])
+  priceMin Decimal @db.Money
+  priceMax Decimal @db.Money
 
-  priceRangeId String?
-  priceRange   PlacePriceRange? @relation(fields: [priceRangeId], references: [id])
+  menuItems MenuItem[]
 
-  cityId String
-  city   City   @relation(fields: [cityId], references: [id])
+  cityId    String
+  city      City   @relation(fields: [cityId], references: [id])
+  address   String @db.Text
+  latitude  Float
+  longitude Float
 
-  dishes         Dish[]
-  operatingHours PlaceOperatingHour[]
-  tags           TagMapping[]
-  reviews        Review[]
-  socialMedia    PlaceSocialMedia[]
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model PlaceSocialMedia {
-  id        String  @id @default(cuid())
-  website   String? @db.VarChar(255)
-  instagram String? @db.VarChar(255)
-  facebook  String? @db.VarChar(255)
+model MenuItem {
+  id String @id @default(cuid())
 
   placeId String
   place   Place  @relation(fields: [placeId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+  images      MenuItemImage[]
+  name        String          @db.VarChar(255)
+  description String?         @db.Text
 
-model PlaceOperatingHour {
-  id          String   @id @default(cuid())
-  day         String   @db.VarChar(100)
-  openingTime DateTime @db.Time()
-  closingTime DateTime @db.Time()
+  reviews MenuItemReview[]
 
-  placeId String
-  place   Place  @relation(fields: [placeId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model PlacePriceRange {
-  id  String @id @default(cuid())
-  min Int
-  max Int
+model MenuItemImage {
+  id String @id @default(cuid())
 
-  places Place[]
+  url String @db.Text
+
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Review {
-  id          String   @id @default(cuid())
-  type        Type
-  rating      Int
-  comment     String?  @db.Text
-  isPublished Boolean  @default(false)
+model MenuItemReview {
+  id String @id @default(cuid())
 
-  likesCountId String    @unique
-  likesCount   LikeCount @relation(fields: [likesCountId], references: [id])
+  menuItemId String?
+  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id])
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  dishId String?
-  Dish   Dish?   @relation(fields: [dishId], references: [id])
-
-  placeId String?
-  Place   Place?  @relation(fields: [placeId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model LikeCount {
-  id    String @id @default(cuid())
-  type  Type
-  likes Int    @default(0)
-
-  Dish   Dish?
-  Place  Place?
-  Review Review?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TagMapping {
-  id   String @id @default(cuid())
-  type Type
-
-  tagId String
-  tag   Tags   @relation(fields: [tagId], references: [id])
-
-  Dish   Dish?   @relation(fields: [dishId], references: [id])
-  dishId String?
-
-  Place   Place?  @relation(fields: [placeId], references: [id])
-  placeId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Tags {
-  id   String @id @default(cuid())
-  name String @db.VarChar(100)
-
-  mappings TagMapping[]
+  rating  Int
+  comment String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -194,21 +113,7 @@ model City {
   latitude  Float
   longitude Float
 
-  users  User[]
   places Place[]
-
-  stateId String
-  state   State  @relation(fields: [stateId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model State {
-  id   String @id @default(cuid())
-  name String @db.VarChar(100)
-
-  cities City[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

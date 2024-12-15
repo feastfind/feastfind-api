@@ -3,6 +3,8 @@ import { apiReference } from '@scalar/hono-api-reference';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
+import { usersRoute } from './features/user/route';
+
 const app = new OpenAPIHono();
 
 app.use(logger());
@@ -31,5 +33,7 @@ app.doc('/openapi.json', {
     description: 'API for FeastFind.com',
   },
 });
+
+app.route('/users', usersRoute);
 
 export default app;

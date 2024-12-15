@@ -5,13 +5,15 @@
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --hot src/index.ts",
-    "seed": "bun --env-file .env prisma db seed",
-    "generate": "bun --env-file .env prisma generate",
-    "migrate": "bun --env-file .env prisma migrate deploy",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "generate": "prisma generate",
+    "seed": "prisma db seed",
+    "studio": "prisma studio",
     "dev:test": "bun --env-file .env.test run --hot src/index.ts",
     "seed:test": "bun --env-file .env.test prisma db seed",
     "generate:test": "bun --env-file .env.test prisma generate",
-    "migrate:test": "bun --env-file .env.test prisma migrate deploy"
+    "migrate:test": "bun --env-file .env.test prisma migrate dev"
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
