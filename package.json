@@ -10,6 +10,7 @@
     "generate": "prisma generate",
     "seed": "prisma db seed",
     "studio": "prisma studio",
+    "reset": "prisma migrate reset --force",
     "dev:test": "bun --env-file .env.test run --hot src/index.ts",
     "seed:test": "bun --env-file .env.test prisma db seed",
     "generate:test": "bun --env-file .env.test prisma generate",

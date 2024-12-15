@@ -39,6 +39,7 @@ model Password {
 model Place {
   id String @id @default(cuid())
 
+  slug        String  @unique @db.VarChar(255)
   name        String  @db.VarChar(255)
   description String? @db.Text
 
@@ -63,14 +64,15 @@ model Place {
 model MenuItem {
   id String @id @default(cuid())
 
+  slug        String  @unique @db.VarChar(255)
+  name        String  @db.VarChar(255)
+  description String? @db.Text
+
+  images  MenuItemImage[]
+  reviews MenuItemReview[]
+
   placeId String
   place   Place  @relation(fields: [placeId], references: [id])
-
-  images      MenuItemImage[]
-  name        String          @db.VarChar(255)
-  description String?         @db.Text
-
-  reviews MenuItemReview[]
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -108,7 +110,9 @@ model MenuItemReview {
 }
 
 model City {
-  id        String @id @default(cuid())
+  id String @id @default(cuid())
+
+  slug      String @unique @db.VarChar(255)
   name      String @db.VarChar(255)
   latitude  Float
   longitude Float
