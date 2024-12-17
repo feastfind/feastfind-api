@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { CitySchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getCities, getCityBySlug } from './service';
+import { isValidCitySlug } from './utils';
 
 const citiesRoute = new OpenAPIHono();
 const API_TAGS = ['City'];
@@ -63,7 +64,7 @@ citiesRoute.openapi(
     try {
       const slug = c.req.param('slug');
 
-      if (!slug) {
+      if (!slug || !isValidCitySlug(slug)) {
         return handleErrorResponse(c, 'Invalid city slug', 400);
       }
 
