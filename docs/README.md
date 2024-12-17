@@ -4,155 +4,83 @@
 
 ```mermaid
 erDiagram
-    User {
-        string id
+    USER {
+        string id PK
+        string name
         string username
         string email
-        string passwordHash
-        string cityId
-        datetime createdAt
-        datetime updatedAt
+        string avatarURL
+        string createdAt
+        string updatedAt
     }
 
-    Favorite {
-        string id
-        string type
-        string userId
-        datetime createdAt
-        datetime updatedAt
+    PASSWORD {
+        string id PK
+        string hash
+        string userId FK
     }
 
-    Dish {
-        string id
+    PLACE {
+        string id PK
+        string slug
         string name
         string description
-        string likeCountId
-        string placeId
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    Place {
-        string id
-        string name
-        string description
+        decimal priceMin
+        decimal priceMax
         string address
         float latitude
         float longitude
-        string likeCountId
-        string priceRangeId
-        string cityId
-        datetime createdAt
-        datetime updatedAt
+        string createdAt
+        string updatedAt
+        string userId FK
+        string cityId FK
     }
 
-    PlaceSocialMedia {
-        string id
-        string website
-        string instagram
-        string facebook
-        string placeId
-        datetime createdAt
-        datetime updatedAt
+    MENU_ITEM {
+        string id PK
+        string slug
+        string name
+        string description
+        string createdAt
+        string updatedAt
+        string placeId FK
+        string userId FK
     }
 
-    PlaceOperatingHour {
-        string id
-        string day
-        datetime openingTime
-        datetime closingTime
-        string placeId
-        datetime createdAt
-        datetime updatedAt
+    MENU_ITEM_IMAGE {
+        string id PK
+        string url
+        string menuItemId FK
+        string createdAt
+        string updatedAt
     }
 
-    PlacePriceRange {
-        string id
-        int min
-        int max
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    Review {
-        string id
-        string type
+    MENU_ITEM_REVIEW {
+        string id PK
+        string menuItemId FK
+        string userId FK
         int rating
         string comment
-        datetime reviewDate
-        boolean isPublished
-        string likesCountId
-        string userId
-        string dishId
-        string placeId
-        datetime createdAt
-        datetime updatedAt
+        string createdAt
+        string updatedAt
     }
 
-    LikeCount {
-        string id
-        string type
-        int likes
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    TagMapping {
-        string id
-        string type
-        string tagId
-        string dishId
-        string placeId
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    Tags {
-        string id
-        string name
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    City {
-        string id
+    CITY {
+        string id PK
+        string slug
         string name
         float latitude
         float longitude
-        string stateId
-        datetime createdAt
-        datetime updatedAt
+        string createdAt
+        string updatedAt
     }
 
-    State {
-        string id
-        string name
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    User ||--o| Favorite : "has"
-    User ||--o| Review : "writes"
-    User ||--|{ City : "lives in"
-    Favorite }|--|| User : "belongs to"
-    Dish ||--o| LikeCount : "has"
-    Dish ||--o| TagMapping : "is tagged by"
-    Dish ||--|{ Review : "has"
-    Dish }|--|| Place : "located in"
-    Place ||--o| LikeCount : "has"
-    Place ||--o| PlaceOperatingHour : "has"
-    Place ||--o| PlaceSocialMedia : "has"
-    Place ||--o| TagMapping : "is tagged by"
-    Place ||--|{ Review : "has"
-    Place }|--|{ City : "is in"
-    PlacePriceRange ||--o| Place : "ranges"
-    Review ||--o| LikeCount : "has"
-    Review ||--|{ User : "written by"
-    Review }|--|| Dish : "reviews"
-    Review }|--|| Place : "reviews"
-    TagMapping ||--|{ Tags : "references"
-    Tags ||--o| TagMapping : "is mapped to"
-    City ||--|{ Place : "has"
-    City ||--|{ User : "has"
-    State ||--|{ City : "contains"
+    USER ||--o| PASSWORD : has
+    USER ||--o| PLACE : owns
+    USER ||--o| MENU_ITEM : creates
+    USER ||--o| MENU_ITEM_REVIEW : writes
+    PLACE ||--o| MENU_ITEM : has
+    PLACE ||--o| CITY : located_in
+    MENU_ITEM ||--o| MENU_ITEM_IMAGE : contains
+    MENU_ITEM ||--o| MENU_ITEM_REVIEW : receives
 ```
