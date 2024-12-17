@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { dataCities } from './data/cities';
 import { dataUsers } from './data/users';
 
 const prisma = new PrismaClient();
@@ -26,9 +27,24 @@ async function upsertUsers() {
   }
 }
 
+async function upsertCities() {
+  for (const city of dataCities) {
+    const newCity = await prisma.city.upsert({
+      where: { slug: city.slug },
+      update: city,
+      create: city,
+    });
+
+    console.log(`New city: ${newCity.name}`);
+  }
+
+  console.log('Cities seeded successfully');
+}
+
 async function main() {
   try {
     await upsertUsers();
+    await upsertCities();
     // await upsertPlaces();
   } catch (e) {
     console.error('❌ Seeding error:', e);
