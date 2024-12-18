@@ -2,7 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { UserSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getAllUsers, getUserByUsername } from './service';
-import { isValidUsername } from './utils';
+import { isValidUsernameSlug } from './utils';
 
 const usersRoute = new OpenAPIHono();
 const API_TAGS = ['User'];
@@ -52,8 +52,8 @@ usersRoute.openapi(
     try {
       const username = c.req.param('username');
 
-      if (!username || !isValidUsername(username)) {
-        return handleErrorResponse(c, 'Invalid username', 400);
+      if (!username || !isValidUsernameSlug(username)) {
+        return handleErrorResponse(c, 'Invalid username slug', 400);
       }
 
       const user = await getUserByUsername(username);
