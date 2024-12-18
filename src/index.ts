@@ -6,6 +6,7 @@ import { logger } from 'hono/logger';
 import { authRoute } from './features/auth/route';
 import { citiesRoute } from './features/city/route';
 import { usersRoute } from './features/user/route';
+import { placesRoute } from './features/places/route';
 
 const app = new OpenAPIHono();
 
@@ -39,5 +40,6 @@ app.doc('/openapi.json', {
 app.route('/users', usersRoute);
 app.route('/cities', citiesRoute);
 app.route('/auth', authRoute);
+app.route('/places', placesRoute)
 
 export default app;
