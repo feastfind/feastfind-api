@@ -20,12 +20,12 @@
     "@prisma/client": "^6.0.1",
     "@scalar/hono-api-reference": "^0.5.164",
     "hono": "^4.6.13",
-    "zod": "^3.24.0",
-    "zod-prisma-types": "^3.2.1"
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "prettier-plugin-prisma": "^5.0.0",
-    "prisma": "^6.0.1"
+    "prisma": "^6.0.1",
+    "zod-prisma-types": "^3.2.1"
   }
 }
