@@ -10,11 +10,7 @@
     "generate": "prisma generate",
     "seed": "prisma db seed",
     "studio": "prisma studio",
-    "reset": "prisma migrate reset --force",
-    "dev:test": "bun --env-file .env.test run --hot src/index.ts",
-    "seed:test": "bun --env-file .env.test prisma db seed",
-    "generate:test": "bun --env-file .env.test prisma generate",
-    "migrate:test": "bun --env-file .env.test prisma migrate dev"
+    "reset": "prisma migrate reset --force"
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
@@ -24,12 +20,12 @@
     "@prisma/client": "^6.0.1",
     "@scalar/hono-api-reference": "^0.5.164",
     "hono": "^4.6.13",
-    "zod": "^3.24.0",
-    "zod-prisma-types": "^3.2.1"
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "prettier-plugin-prisma": "^5.0.0",
-    "prisma": "^6.0.1"
+    "prisma": "^6.0.1",
+    "zod-prisma-types": "^3.2.1"
   }
 }
