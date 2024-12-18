@@ -1,4 +1,4 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { UserSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getAllUsers, getUserByUsername } from './service';
@@ -35,9 +35,12 @@ usersRoute.openapi(
 usersRoute.openapi(
   {
     method: 'get',
-    path: '/:username',
+    path: '/{username}',
     description: 'Get a user by username.',
     tags: API_TAGS,
+    request: {
+      params: z.object({ username: z.string().max(100) }),
+    },
     responses: {
       200: {
         description: 'Get all users',
@@ -45,22 +48,16 @@ usersRoute.openapi(
       },
       400: { description: 'Invalid username' },
       404: { description: 'User not found' },
-      500: { description: 'Failed to retrieve user' },
+      500: { description: 'Failed to get user' },
     },
   },
   async (c) => {
     try {
-      const username = c.req.param('username');
-
-      if (!username || !isValidUsernameSlug(username)) {
-        return handleErrorResponse(c, 'Invalid username slug', 400);
-      }
+      const { username } = c.req.valid('param');
 
       const user = await getUserByUsername(username);
 
-      if (!user) {
-        return handleErrorResponse(c, 'User not found', 404);
-      }
+      if (!user) return handleErrorResponse(c, 'User not found', 404);
 
       return c.json(user, 200);
     } catch (error) {

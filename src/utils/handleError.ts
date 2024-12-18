@@ -2,10 +2,10 @@ import type { Context } from 'hono';
 import type { StatusCode } from 'hono/utils/http-status';
 
 export function handleErrorResponse(
-  context: Context,
+  c: Context,
   message: string,
   statusCode: StatusCode
 ) {
   console.error(message);
-  return context.json({ message }, statusCode);
+  return c.json({ message }, statusCode);
 }
