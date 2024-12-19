@@ -26,6 +26,8 @@ async function seedUsers() {
 
     console.log(`New user: ${newUser.email}`);
   }
+
+  console.log('Users seeded successfully \n');
 }
 
 async function seedCities() {
@@ -39,7 +41,7 @@ async function seedCities() {
     console.log(`New city: ${newCity.name}`);
   }
 
-  console.log('Cities seeded successfully');
+  console.log('Cities seeded successfully \n');
 }
 
 async function seedPlaces() {
