@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
 import { dataUsers } from './data/users';
 import { dataPlaces } from './data/places'; // Added import for dataPlaces
+import { dataMenuItems } from './data/menuItems'; // Added import for dataMenuItems
+import { connect } from 'bun';
 
 const prisma = new PrismaClient();
 
@@ -76,11 +78,37 @@ async function seedPlaces() {
   console.log('Places seeded successfully');
 }
 
+async function seedMenuItems() {
+  for (const menuItem of dataMenuItems) {
+    const { placeSlug, username, images, ...menuItemData } = menuItem;
+
+    const [place, user] = await Promise.all([
+      prisma.place.findUnique({ where: { slug: placeSlug } }),
+      prisma.user.findUnique({ where: { username } }),
+    ]);
+
+    if (!place || !user) {
+      console.log(
+        `Skipping menu item ${menuItem.name} - place or user not found`
+      );
+      continue;
+    }
+
+    const menuItemUpsertData = {
+      ...menuItemData,
+      place: { connect: { id: place.id } },
+      user: { connect: { id: user.id } },
+      images: { createOrConnect: images },
+    };
+  }
+}
+
 async function main() {
   try {
     await seedUsers();
     await seedCities();
     await seedPlaces(); // Added call to seedPlaces
+    await seedMenuItems(); // Added call to seedMenuItems
   } catch (e) {
     console.error('❌ Seeding error:', e);
     process.exit(1);
