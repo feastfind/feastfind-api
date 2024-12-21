@@ -5,8 +5,8 @@ import { logger } from 'hono/logger';
 
 import { authRoute } from './features/auth/route';
 import { citiesRoute } from './features/city/route';
-import { usersRoute } from './features/user/route';
 import { placesRoute } from './features/places/route';
+import { usersRoute } from './features/user/route';
 
 const app = new OpenAPIHono();
 
@@ -37,9 +37,20 @@ app.doc('/openapi.json', {
   },
 });
 
+app.openAPIRegistry.registerComponent(
+  'securitySchemes',
+  'AuthorizationBearer',
+  {
+    type: 'http',
+    scheme: 'bearer',
+    in: 'header',
+    description: 'Bearer token',
+  }
+);
+
 app.route('/users', usersRoute);
 app.route('/cities', citiesRoute);
 app.route('/auth', authRoute);
-app.route('/places', placesRoute)
+app.route('/places', placesRoute);
 
 export default app;
