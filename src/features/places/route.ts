@@ -1,7 +1,7 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { PlaceSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { getPlaceBySlug, getPlaces } from './service';
+import { getPlaceByParam, getPlaces } from './service';
 
 const placesRoute = new OpenAPIHono();
 const API_TAGS = ['Place'];
@@ -40,11 +40,13 @@ placesRoute.openapi(
 placesRoute.openapi(
   {
     method: 'get',
-    path: '/{slug}',
-    description: 'Get a place by slug.',
+    path: '/{param}',
+    description: 'Get a place by param.',
     tags: API_TAGS,
     request: {
-      params: z.object({ slug: z.string().max(255) }),
+      params: z.object({
+        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+      }),
     },
     responses: {
       200: {
@@ -64,9 +66,9 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const { slug } = c.req.valid('param');
+      const { param } = c.req.valid('param');
 
-      const place = await getPlaceBySlug(slug);
+      const place = await getPlaceByParam(param);
 
       if (!place) return handleErrorResponse(c, 'Place not found', 404);
 

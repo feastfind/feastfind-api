@@ -1,7 +1,7 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { CitySchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { getCities, getCityBySlug } from './service';
+import { getCities, getCityByParam } from './service';
 
 const citiesRoute = new OpenAPIHono();
 const API_TAGS = ['City'];
@@ -40,16 +40,21 @@ citiesRoute.openapi(
 citiesRoute.openapi(
   {
     method: 'get',
-    path: '/{slug}',
-    description: 'Get a city by slug.',
+    path: '/{param}',
+    description: 'Get a city by param.',
     tags: API_TAGS,
     request: {
-      params: z.object({ slug: z.string().max(255) }),
+      params: z.object({
+        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+      }),
     },
     responses: {
       200: {
         description: 'City retrieved successfully',
         content: { 'application/json': { schema: CitySchema } },
+      },
+      400: {
+        description: 'Invalid param',
       },
       404: {
         description: 'City not found',
@@ -61,9 +66,9 @@ citiesRoute.openapi(
   },
   async (c) => {
     try {
-      const { slug } = c.req.valid('param');
+      const { param } = c.req.valid('param');
 
-      const city = await getCityBySlug(slug);
+      const city = await getCityByParam(param);
 
       if (!city) return handleErrorResponse(c, 'City not found', 404);
 
