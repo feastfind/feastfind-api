@@ -1,12 +1,7 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
-import {
-  PlaceCreateWithoutCityInputSchema,
-  PlaceSchema,
-} from '../../../prisma/generated/zod';
-import { authenticateUser } from '../../middlewares/authenticateUser';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
+import { PlaceSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { createPlace, getPlaceBySlug, getPlaces } from './service';
-import { isValidPlaceSlug } from './utils';
+import { getPlaceBySlug, getPlaces } from './service';
 
 const placesRoute = new OpenAPIHono();
 const API_TAGS = ['Place'];
@@ -45,9 +40,12 @@ placesRoute.openapi(
 placesRoute.openapi(
   {
     method: 'get',
-    path: '/:slug',
+    path: '/{slug}',
     description: 'Get a place by slug.',
     tags: API_TAGS,
+    request: {
+      params: z.object({ slug: z.string().max(255) }),
+    },
     responses: {
       200: {
         description: 'Place retrieved successfully',
@@ -66,17 +64,11 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const slug = c.req.param('slug');
-
-      if (!slug || !isValidPlaceSlug(slug)) {
-        return handleErrorResponse(c, 'Invalid place slug', 400);
-      }
+      const { slug } = c.req.valid('param');
 
       const place = await getPlaceBySlug(slug);
 
-      if (!place) {
-        return handleErrorResponse(c, 'Place not found', 404);
-      }
+      if (!place) return handleErrorResponse(c, 'Place not found', 404);
 
       return c.json(place, 200);
     } catch (error) {
@@ -142,7 +134,6 @@ placesRoute.openapi(
 //         latitude,
 //         longitude
 //       );
-
 
 //     } catch (error) {
 //       return handleErrorResponse(c, `Failed to create place: ${error} `, 500);

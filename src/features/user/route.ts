@@ -2,7 +2,6 @@ import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { UserSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getAllUsers, getUserByUsername } from './service';
-import { isValidUsernameSlug } from './utils';
 
 const usersRoute = new OpenAPIHono();
 const API_TAGS = ['User'];

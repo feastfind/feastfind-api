@@ -9,7 +9,6 @@ export const RegisterUserSchema = z.object({
 });
 
 export const LoginUserSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: z.string().min(1).max(255),
+  password: z.string().min(1).max(255),
 });
-

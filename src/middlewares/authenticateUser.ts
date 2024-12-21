@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory';
-import { validateToken } from '../utils/token';
 import { getUserById } from '../features/user/service';
 import { handleErrorResponse } from '../utils/handleError';
+import { validateToken } from '../utils/token';
 
 type Env = {
   Variables: {
