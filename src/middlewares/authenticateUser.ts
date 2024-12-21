@@ -1,5 +1,5 @@
 import { createMiddleware } from 'hono/factory';
-import { getUserById } from '../features/user/service';
+import prisma from '../lib/db';
 import { handleErrorResponse } from '../utils/handleError';
 import { validateToken } from '../utils/token';
 
@@ -30,7 +30,11 @@ export const authenticateUser = createMiddleware<Env>(async (c, next) => {
     return handleErrorResponse(c, 'Invalid token', 401);
   }
 
-  const user = await getUserById(payload.userId);
+  const user = await prisma.user.findUnique({
+    where: {
+      id: payload.userId,
+    },
+  });
 
   if (!user) {
     return handleErrorResponse(c, 'User not found', 401);

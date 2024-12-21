@@ -5,10 +5,20 @@ export const getPlaces = async (): Promise<Place[]> => {
   return await prisma.place.findMany();
 };
 
-export const getPlaceBySlug = async (slug: string): Promise<Place | null> => {
-  return await prisma.place.findUnique({
+export const getPlaceByParam = async (param: string): Promise<Place | null> => {
+  const isCUID = /^[a-z0-9]{25}$/.test(param);
+
+  if (isCUID) {
+    return await prisma.place.findUnique({
+      where: {
+        id: param,
+      },
+    });
+  }
+
+  return await prisma.place.findFirst({
     where: {
-      slug,
+      OR: [{ slug: param }, { id: param }],
     },
   });
 };
