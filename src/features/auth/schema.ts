@@ -9,6 +9,9 @@ export const RegisterUserSchema = z.object({
 });
 
 export const LoginUserSchema = z.object({
-  email: z.string().min(1).max(255),
+  identifier: z
+    .string()
+    .max(255)
+    .openapi({ description: 'identifier: email | username' }),
   password: z.string().min(1).max(255),
 });
