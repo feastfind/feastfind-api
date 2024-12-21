@@ -1,11 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
-import { dataPlaces } from './data/places';
 import { dataUsers } from './data/users';
+import { dataPlaces } from './data/places'; // Added import for dataPlaces
+import { dataMenuItems } from './data/menuItems'; // Added import for dataMenuItems
+import { connect } from 'bun';
 
 const prisma = new PrismaClient();
 
-async function upsertUsers() {
+async function seedUsers() {
   for (const user of dataUsers) {
     const avatarURL = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.username}&size=64`;
 
@@ -17,8 +19,8 @@ async function upsertUsers() {
         avatarURL,
       },
       create: {
-        name: user.name,
         username: user.username,
+        name: user.name,
         email: user.email,
         avatarURL,
       },
@@ -30,7 +32,7 @@ async function upsertUsers() {
   console.log('Users seeded successfully \n');
 }
 
-async function upsertCities() {
+async function seedCities() {
   for (const city of dataCities) {
     const newCity = await prisma.city.upsert({
       where: { slug: city.slug },
@@ -44,53 +46,69 @@ async function upsertCities() {
   console.log('Cities seeded successfully \n');
 }
 
-async function upsertPlaces() {
-  const userIds = dataPlaces.map((place) => place.userId);
-  const cityIds = dataPlaces.map((place) => place.cityId);
-
-  const [users, cities] = await Promise.all([
-    prisma.user.findMany({
-      where: { id: { in: userIds } },
-    }),
-    prisma.city.findMany({
-      where: { id: { in: cityIds } },
-    }),
-  ]);
-
-  const userMap = new Map(users.map((user) => [user.id, user]));
-  const cityMap = new Map(cities.map((city) => [city.id, city]));
-
+async function seedPlaces() {
   for (const place of dataPlaces) {
-    const user = userMap.get(place.userId);
-    const city = cityMap.get(place.cityId);
+    const { citySlug, username, ...placeData } = place;
 
-    if (!user) {
-      console.error(`User not found: ${place.userId}`);
-      continue; 
+    const [city, user] = await Promise.all([
+      prisma.city.findUnique({ where: { slug: citySlug } }),
+      prisma.user.findUnique({ where: { username } }),
+    ]);
+
+    if (!city || !user) {
+      console.log(`Skipping place ${place.name} - city or user not found`);
+      continue;
     }
 
-    if (!city) {
-      console.error(`City not found: ${place.cityId}`);
-      continue; 
-    }
+    const placeUpsertData = {
+      ...placeData,
+      city: { connect: { id: city.id } },
+      user: { connect: { id: user.id } },
+    };
 
     const newPlace = await prisma.place.upsert({
       where: { slug: place.slug },
-      update: place,
-      create: place,
+      update: placeUpsertData,
+      create: placeUpsertData,
     });
 
-    console.log(`New place: ${newPlace.name}`);
+    console.log(`New place: ${newPlace.name} in ${city.name}`);
   }
 
-  console.log('Places seeded successfully \n');
+  console.log('Places seeded successfully');
+}
+
+async function seedMenuItems() {
+  for (const menuItem of dataMenuItems) {
+    const { placeSlug, username, images, ...menuItemData } = menuItem;
+
+    const [place, user] = await Promise.all([
+      prisma.place.findUnique({ where: { slug: placeSlug } }),
+      prisma.user.findUnique({ where: { username } }),
+    ]);
+
+    if (!place || !user) {
+      console.log(
+        `Skipping menu item ${menuItem.name} - place or user not found`
+      );
+      continue;
+    }
+
+    const menuItemUpsertData = {
+      ...menuItemData,
+      place: { connect: { id: place.id } },
+      user: { connect: { id: user.id } },
+      images: { createOrConnect: images },
+    };
+  }
 }
 
 async function main() {
   try {
-    await upsertUsers();
-    await upsertCities();
-    await upsertPlaces();
+    await seedUsers();
+    await seedCities();
+    await seedPlaces(); // Added call to seedPlaces
+    await seedMenuItems(); // Added call to seedMenuItems
   } catch (e) {
     console.error('❌ Seeding error:', e);
     process.exit(1);
