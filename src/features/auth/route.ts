@@ -96,9 +96,9 @@ authRoute.openapi(
   },
   async (c) => {
     try {
-      const { email, password } = c.req.valid('json');
+      const { identifier, password } = c.req.valid('json');
 
-      const { token, user } = await loginUser(email, password);
+      const { token, user } = await loginUser(identifier, password);
 
       if (!token) {
         return handleErrorResponse(c, 'Invalid email or password', 401);

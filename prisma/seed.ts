@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
-import { dataUsers } from './data/users';
-import { dataPlaces } from './data/places'; // Added import for dataPlaces
 import { dataMenuItems } from './data/menuItems'; // Added import for dataMenuItems
-import { connect } from 'bun';
+import { dataPlaces } from './data/places'; // Added import for dataPlaces
+import { dataUsers } from './data/users';
+import { hashPassword } from '../src/utils/password';
 
 const prisma = new PrismaClient();
 
@@ -11,18 +11,22 @@ async function seedUsers() {
   for (const user of dataUsers) {
     const avatarURL = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.username}&size=64`;
 
+    const hashedPassword = await hashPassword(user.password);
+
     const newUser = await prisma.user.upsert({
       where: { username: user.username },
       update: {
         name: user.name,
         email: user.email,
         avatarURL,
+        password: { update: { hash: hashedPassword } },
       },
       create: {
         username: user.username,
         name: user.name,
         email: user.email,
         avatarURL,
+        password: { create: { hash: hashedPassword } },
       },
     });
 
