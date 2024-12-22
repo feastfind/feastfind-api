@@ -6,16 +6,16 @@ import {
   getMenuItemReviewsByMenuItemParam,
   getMenuItems,
 } from './service';
+import { API_TAGS } from '../../config/config';
 
 const menuItemsRoute = new OpenAPIHono();
-const API_TAGS = ['MenuItem'];
 
 menuItemsRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get a list of menu items.',
-    tags: API_TAGS,
+    tags: API_TAGS.MENU_ITEM,
     responses: {
       200: {
         description: 'Menu Items retrieved successfully',
@@ -46,7 +46,7 @@ menuItemsRoute.openapi(
     method: 'get',
     path: '/{param}',
     description: 'Get a menu item by param.',
-    tags: API_TAGS,
+    tags: API_TAGS.MENU_ITEM,
     request: {
       params: z.object({
         param: z.string().max(255).openapi({ description: 'param: slug | id' }),
@@ -92,7 +92,7 @@ menuItemsRoute.openapi(
     method: 'get',
     path: '/{param}/reviews',
     description: 'Get menu item reviews by menu param.',
-    tags: ['MenuItemReview'],
+    tags: API_TAGS.MENU_ITEM_REVIEW,
     request: {
       params: z.object({
         param: z

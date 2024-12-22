@@ -2,16 +2,16 @@ import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { UserSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getAllUsers, getUserByParam } from './service';
+import { API_TAGS } from '../../config/config';
 
 const usersRoute = new OpenAPIHono();
-const API_TAGS = ['User'];
 
 usersRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get all users without pagination',
-    tags: API_TAGS,
+    tags: API_TAGS.USER,
     responses: {
       200: {
         description: 'Get all users',
@@ -36,7 +36,7 @@ usersRoute.openapi(
     method: 'get',
     path: '/{param}',
     description: 'Get a user by param.',
-    tags: API_TAGS,
+    tags: API_TAGS.USER,
     request: {
       params: z.object({
         param: z

@@ -2,16 +2,16 @@ import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { PlaceSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getPlaceByParam, getPlaces } from './service';
+import { API_TAGS } from '../../config/config';
 
 const placesRoute = new OpenAPIHono();
-const API_TAGS = ['Place'];
 
 placesRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get a list of places.',
-    tags: API_TAGS,
+    tags: API_TAGS.PLACE,
     responses: {
       200: {
         description: 'Places retrieved successfully',
@@ -42,7 +42,7 @@ placesRoute.openapi(
     method: 'get',
     path: '/{param}',
     description: 'Get a place by param.',
-    tags: API_TAGS,
+    tags: API_TAGS.PLACE,
     request: {
       params: z.object({
         param: z.string().max(255).openapi({ description: 'param: slug | id' }),
