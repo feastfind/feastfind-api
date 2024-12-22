@@ -4,16 +4,17 @@ import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
 import { LoginUserSchema, RegisterUserSchema } from './schema';
 import { loginUser, registerUser } from './service';
+import { getDiceBearAvatar } from './utils';
+import { API_TAGS } from '../../config/config';
 
 const authRoute = new OpenAPIHono();
-const API_TAGS = ['Auth'];
 
 authRoute.openapi(
   {
     method: 'post',
     path: '/register',
     description: 'Register user.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
@@ -24,8 +25,8 @@ authRoute.openapi(
       },
     },
     responses: {
-      200: {
-        description: 'User registered successfully',     
+      201: {
+        description: 'User registered successfully',
         content: { 'application/json': { schema: UserSchema } },
       },
       400: {
@@ -38,31 +39,24 @@ authRoute.openapi(
   },
   async (c) => {
     try {
-      const data = await c.req.json();
-      const parsed = RegisterUserSchema.safeParse(data);
-
-      if (!parsed.success) {
-        return handleErrorResponse(
-          c,
-          `Validation error:${parsed.error.message}`,
-          400
-        );
-      }
-
-      const { name, username, email, avatarURL, password } = parsed.data;
+      const { name, username, email, avatarURL, password } =
+        c.req.valid('json');
 
       const user = await registerUser(
         name,
         username,
         email,
-        avatarURL ?? '',
+        avatarURL ?? getDiceBearAvatar(username, 64),
         password
       );
 
-      return c.json({
-        message: 'User registered successfully',
-        user,
-      }, 200);
+      return c.json(
+        {
+          message: 'User registered successfully',
+          user,
+        },
+        201
+      );
     } catch (error) {
       return handleErrorResponse(c, `Failed to register user: ${error} `, 500);
     }
@@ -74,7 +68,7 @@ authRoute.openapi(
     method: 'post',
     path: '/login',
     description: 'Login user.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
@@ -102,20 +96,9 @@ authRoute.openapi(
   },
   async (c) => {
     try {
-      const data = await c.req.json();
-      const parsed = LoginUserSchema.safeParse(data);
+      const { identifier, password } = c.req.valid('json');
 
-      if (!parsed.success) {
-        return handleErrorResponse(
-          c,
-          `Validation error:${parsed.error.message}`,
-          400
-        );
-      }
-
-      const { email, password } = parsed.data;
-
-      const { token, user } = await loginUser(email, password);
+      const { token, user } = await loginUser(identifier, password);
 
       if (!token) {
         return handleErrorResponse(c, 'Invalid email or password', 401);
@@ -140,7 +123,8 @@ authRoute.openapi(
     method: 'get',
     path: '/me',
     description: 'Get authenticated user information.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
+    security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     responses: {
       200: {

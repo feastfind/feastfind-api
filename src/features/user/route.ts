@@ -1,18 +1,17 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { UserSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { getAllUsers, getUserByUsername } from './service';
-import { isValidUsernameSlug } from './utils';
+import { getAllUsers, getUserByParam } from './service';
+import { API_TAGS } from '../../config/config';
 
 const usersRoute = new OpenAPIHono();
-const API_TAGS = ['User'];
 
 usersRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get all users without pagination',
-    tags: API_TAGS,
+    tags: API_TAGS.USER,
     responses: {
       200: {
         description: 'Get all users',
@@ -35,27 +34,32 @@ usersRoute.openapi(
 usersRoute.openapi(
   {
     method: 'get',
-    path: '/{username}',
-    description: 'Get a user by username.',
-    tags: API_TAGS,
+    path: '/{param}',
+    description: 'Get a user by param.',
+    tags: API_TAGS.USER,
     request: {
-      params: z.object({ username: z.string().max(100) }),
+      params: z.object({
+        param: z
+          .string()
+          .max(255)
+          .openapi({ description: 'param: username | id | email' }),
+      }),
     },
     responses: {
       200: {
-        description: 'Get all users',
+        description: 'User retrieved successfully',
         content: { 'application/json': { schema: UserSchema.array() } },
       },
-      400: { description: 'Invalid username' },
+      400: { description: 'Invalid param' },
       404: { description: 'User not found' },
       500: { description: 'Failed to get user' },
     },
   },
   async (c) => {
     try {
-      const { username } = c.req.valid('param');
+      const { param } = c.req.valid('param');
 
-      const user = await getUserByUsername(username);
+      const user = await getUserByParam(param);
 
       if (!user) return handleErrorResponse(c, 'User not found', 404);
 

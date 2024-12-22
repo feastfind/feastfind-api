@@ -1,22 +1,17 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
-import {
-  PlaceCreateWithoutCityInputSchema,
-  PlaceSchema,
-} from '../../../prisma/generated/zod';
-import { authenticateUser } from '../../middlewares/authenticateUser';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
+import { PlaceSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { createPlace, getPlaceBySlug, getPlaces } from './service';
-import { isValidPlaceSlug } from './utils';
+import { getPlaceByParam, getPlaces } from './service';
+import { API_TAGS } from '../../config/config';
 
 const placesRoute = new OpenAPIHono();
-const API_TAGS = ['Place'];
 
 placesRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get a list of places.',
-    tags: API_TAGS,
+    tags: API_TAGS.PLACE,
     responses: {
       200: {
         description: 'Places retrieved successfully',
@@ -45,9 +40,14 @@ placesRoute.openapi(
 placesRoute.openapi(
   {
     method: 'get',
-    path: '/:slug',
-    description: 'Get a place by slug.',
-    tags: API_TAGS,
+    path: '/{param}',
+    description: 'Get a place by param.',
+    tags: API_TAGS.PLACE,
+    request: {
+      params: z.object({
+        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+      }),
+    },
     responses: {
       200: {
         description: 'Place retrieved successfully',
@@ -66,17 +66,11 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const slug = c.req.param('slug');
+      const { param } = c.req.valid('param');
 
-      if (!slug || !isValidPlaceSlug(slug)) {
-        return handleErrorResponse(c, 'Invalid place slug', 400);
-      }
+      const place = await getPlaceByParam(param);
 
-      const place = await getPlaceBySlug(slug);
-
-      if (!place) {
-        return handleErrorResponse(c, 'Place not found', 404);
-      }
+      if (!place) return handleErrorResponse(c, 'Place not found', 404);
 
       return c.json(place, 200);
     } catch (error) {
@@ -142,7 +136,6 @@ placesRoute.openapi(
 //         latitude,
 //         longitude
 //       );
-
 
 //     } catch (error) {
 //       return handleErrorResponse(c, `Failed to create place: ${error} `, 500);

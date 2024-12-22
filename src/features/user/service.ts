@@ -1,27 +1,25 @@
 import { User } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
+import { isValidCUID, isValidEmail } from '../../utils/regex';
 
 export const getAllUsers = async (): Promise<User[]> => {
   return await prisma.user.findMany();
-}
+};
 
-export const getUserByUsername = async (username: string): Promise<User | null> => {
+export const getUserByParam = async (param: string): Promise<User | null> => {
+  const isEmail = isValidEmail(param);
+  const isCUID = isValidCUID(param);
+
   return await prisma.user.findUnique({
-    where: {
-      username,
-    },
+    where: isEmail
+      ? { email: param }
+      : isCUID
+        ? { id: param }
+        : { username: param },
     include: {
       places: true,
       menuItems: true,
       menuItemReview: true,
-    }
-  })
-}
-
-export const getUserById = async (id: string): Promise<User | null> => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
     },
-  })
-}
+  });
+};

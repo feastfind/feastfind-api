@@ -56,20 +56,24 @@ export const registerUser = async (
 };
 
 export const loginUser = async (
-  email: string,
-  password: string
+  identifier: string,
+  password: string,
 ): Promise<{ token: string | null; user: Partial<User> }> => {
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+
   const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
+    where: isEmail ? { email: identifier } : { username: identifier },
     include: {
       password: true,
     },
   });
 
-  if (!user || !user.password) {
-    throw new Error('Invalid email');
+  if (!user) {
+    throw new Error('Invalid email or username');
+  }
+
+  if (!user.password) {
+    throw new Error('User does not have a password');
   }
 
   const isValidPassword = await verifyPassword(password, user.password.hash);

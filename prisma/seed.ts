@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
+import { dataMenuItems } from './data/menuItems';
+import { dataPlaces } from './data/places';
 import { dataUsers } from './data/users';
-import { dataPlaces } from './data/places'; // Added import for dataPlaces
-import { dataMenuItems } from './data/menuItems'; // Added import for dataMenuItems
-import { connect } from 'bun';
+import { hashPassword } from '../src/utils/password';
 
 const prisma = new PrismaClient();
 
@@ -11,18 +11,22 @@ async function seedUsers() {
   for (const user of dataUsers) {
     const avatarURL = `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.username}&size=64`;
 
+    const hashedPassword = await hashPassword(user.password);
+
     const newUser = await prisma.user.upsert({
       where: { username: user.username },
       update: {
         name: user.name,
         email: user.email,
         avatarURL,
+        password: { update: { hash: hashedPassword } },
       },
       create: {
         username: user.username,
         name: user.name,
         email: user.email,
         avatarURL,
+        password: { create: { hash: hashedPassword } },
       },
     });
 
@@ -104,27 +108,29 @@ async function seedMenuItems() {
       ...menuItemData,
       place: { connect: { id: place.id } },
       user: { connect: { id: user.id } },
-      images: { connectOrCreate: imagesUrl },
+      images: {
+        create: images.map((image) => ({ url: image.url })),
+      },
     };
 
-    console.log('MENU ITEM UPSERT DATA', menuItemUpsertData);
+    const newMenuItem = await prisma.menuItem.upsert({
+      where: { slug: menuItem.slug },
+      update: menuItemUpsertData,
+      create: menuItemUpsertData,
+    });
 
-    // const newMenuItem = await prisma.menuItem.upsert({
-    //   where: { slug: menuItem.slug },
-    //   update: menuItemUpsertData,
-    //   create: menuItemUpsertData,
-    // });
-
-    // console.log(`New place: ${newMenuItem.name} in ${place.name}`);
+    console.log(`New menu item: ${newMenuItem.name} in ${place.name}`);
   }
+
+  console.log('Menu Items seeded successfully');
 }
 
 async function main() {
   try {
     await seedUsers();
     await seedCities();
-    await seedPlaces(); // Added call to seedPlaces
-    await seedMenuItems(); // Added call to seedMenuItems
+    await seedPlaces();
+    await seedMenuItems();
   } catch (e) {
     console.error('❌ Seeding error:', e);
     process.exit(1);

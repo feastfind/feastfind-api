@@ -1,18 +1,17 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { CitySchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { getCities, getCityBySlug } from './service';
-import { isValidCitySlug } from './utils';
+import { getCities, getCityByParam } from './service';
+import { API_TAGS } from '../../config/config';
 
 const citiesRoute = new OpenAPIHono();
-const API_TAGS = ['City'];
 
 citiesRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get a list of cities.',
-    tags: API_TAGS,
+    tags: API_TAGS.CITY,
     responses: {
       200: {
         description: 'Cities retrieved successfully',
@@ -41,16 +40,21 @@ citiesRoute.openapi(
 citiesRoute.openapi(
   {
     method: 'get',
-    path: '/:slug',
-    description: 'Get a city by slug.',
-    tags: API_TAGS,
+    path: '/{param}',
+    description: 'Get a city by param.',
+    tags: API_TAGS.CITY,
+    request: {
+      params: z.object({
+        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+      }),
+    },
     responses: {
       200: {
         description: 'City retrieved successfully',
         content: { 'application/json': { schema: CitySchema } },
       },
       400: {
-        description: 'Invalid city slug',
+        description: 'Invalid param',
       },
       404: {
         description: 'City not found',
@@ -62,21 +66,11 @@ citiesRoute.openapi(
   },
   async (c) => {
     try {
-      const slug = c.req.param('slug');
+      const { param } = c.req.valid('param');
 
-      if (!slug || !isValidCitySlug(slug)) {
-        return handleErrorResponse(c, 'Invalid city slug', 400);
-      }
+      const city = await getCityByParam(param);
 
-      const city = await getCityBySlug(slug);
-
-      if (!city) {
-        return handleErrorResponse(
-          c,
-          'City not found',
-          404
-        );
-      }
+      if (!city) return handleErrorResponse(c, 'City not found', 404);
 
       return c.json(city, 200);
     } catch (error) {

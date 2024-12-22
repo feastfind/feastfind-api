@@ -1,18 +1,18 @@
 import { Place } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
-import { getCoordinate } from '../../lib/getCoordinate';
+import { isValidCUID } from '../../utils/regex';
 
 export const getPlaces = async (): Promise<Place[]> => {
   return await prisma.place.findMany();
-}
+};
 
-export const getPlaceBySlug = async (slug: string): Promise<Place | null> => {
+export const getPlaceByParam = async (param: string): Promise<Place | null> => {
+  const isCUID = isValidCUID(param);
+
   return await prisma.place.findUnique({
-    where: {
-      slug,
-    },
-  })
-}
+    where: isCUID ? { id: param } : { slug: param },
+  });
+};
 
 // export const createPlace = async (
 //   name: string,
@@ -30,7 +30,7 @@ export const getPlaceBySlug = async (slug: string): Promise<Place | null> => {
 
 //   const { lat, lon } = coordinate;
 
-//   // generate slug 
+//   // generate slug
 //   // create city -> validate city name (getLoc?)
 
 //   const newPlace = await prisma.place.create({
@@ -44,7 +44,7 @@ export const getPlaceBySlug = async (slug: string): Promise<Place | null> => {
 //       latitude: lat,
 //       longitude: lon,
 //     },
-    
+
 //   });
 
 // };
