@@ -1,17 +1,21 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { MenuItemSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
-import { getMenuItems, getMenuItemByParam} from './service'
+import {
+  getMenuItemByParam,
+  getMenuItemReviewsByMenuItemParam,
+  getMenuItems,
+} from './service';
+import { API_TAGS } from '../../config/config';
 
 const menuItemsRoute = new OpenAPIHono();
-const API_TAGS = ['MenuItem'];
 
 menuItemsRoute.openapi(
   {
     method: 'get',
     path: '/',
     description: 'Get a list of menu items.',
-    tags: API_TAGS,
+    tags: API_TAGS.MENU_ITEM,
     responses: {
       200: {
         description: 'Menu Items retrieved successfully',
@@ -42,7 +46,7 @@ menuItemsRoute.openapi(
     method: 'get',
     path: '/{param}',
     description: 'Get a menu item by param.',
-    tags: API_TAGS,
+    tags: API_TAGS.MENU_ITEM,
     request: {
       params: z.object({
         param: z.string().max(255).openapi({ description: 'param: slug | id' }),
@@ -77,6 +81,62 @@ menuItemsRoute.openapi(
       return handleErrorResponse(
         c,
         `Failed to retrieve menu item: ${error} `,
+        500
+      );
+    }
+  }
+);
+
+menuItemsRoute.openapi(
+  {
+    method: 'get',
+    path: '/{param}/reviews',
+    description: 'Get menu item reviews by menu param.',
+    tags: API_TAGS.MENU_ITEM_REVIEW,
+    request: {
+      params: z.object({
+        param: z
+          .string()
+          .max(255)
+          .openapi({ description: 'param: menu slug | menu id' }),
+      }),
+    },
+    responses: {
+      200: {
+        description: 'Menu item reviews retrieved successfully',
+        content: { 'application/json': { schema: MenuItemSchema } },
+      },
+      400: {
+        description: 'Invalid menu param',
+      },
+      404: {
+        description: 'Menu item reviews not found',
+      },
+      500: {
+        description: 'Failed to retrieve menu item reviews',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const { param } = c.req.valid('param');
+
+      const menuItem = await getMenuItemByParam(param);
+
+      if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
+
+      const menuItemReviews = await getMenuItemReviewsByMenuItemParam(
+        menuItem.id
+      );
+
+      if (!menuItemReviews)
+        return handleErrorResponse(c, 'Menu item reviews not found', 404);
+
+      return c.json(menuItemReviews, 200);
+    } catch (error) {
+      return handleErrorResponse(
+        c,
+        `Failed to retrieve menu item reviews: ${error} `,
         500
       );
     }

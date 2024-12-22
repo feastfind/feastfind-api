@@ -1,4 +1,4 @@
-import { MenuItem } from '../../../prisma/generated/zod';
+import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 import { isValidCUID } from '../../utils/regex';
 
@@ -15,3 +15,12 @@ export const getMenuItemByParam = async (
     where: isCUID ? { id: param } : { slug: param },
   });
 };
+
+export const getMenuItemReviewsByMenuItemParam = async (
+  menuItemId: string
+): Promise<MenuItemReview[] | null> =>
+  await prisma.menuItemReview.findMany({
+    where: {
+      menuItemId,
+    },
+  });

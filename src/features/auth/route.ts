@@ -5,16 +5,16 @@ import { handleErrorResponse } from '../../utils/handleError';
 import { LoginUserSchema, RegisterUserSchema } from './schema';
 import { loginUser, registerUser } from './service';
 import { getDiceBearAvatar } from './utils';
+import { API_TAGS } from '../../config/config';
 
 const authRoute = new OpenAPIHono();
-const API_TAGS = ['Auth'];
 
 authRoute.openapi(
   {
     method: 'post',
     path: '/register',
     description: 'Register user.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
@@ -68,7 +68,7 @@ authRoute.openapi(
     method: 'post',
     path: '/login',
     description: 'Login user.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
@@ -123,7 +123,7 @@ authRoute.openapi(
     method: 'get',
     path: '/me',
     description: 'Get authenticated user information.',
-    tags: API_TAGS,
+    tags: API_TAGS.AUTH,
     security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     responses: {
