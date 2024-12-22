@@ -94,12 +94,28 @@ async function seedMenuItems() {
       continue;
     }
 
+    const imagesUrl = images.map((image) => {
+      return { where: { url: image.url }, create: { url: image.url } };
+    });
+
+    console.log(imagesUrl);
+
     const menuItemUpsertData = {
       ...menuItemData,
       place: { connect: { id: place.id } },
       user: { connect: { id: user.id } },
-      images: { createOrConnect: images },
+      images: { connectOrCreate: imagesUrl },
     };
+
+    console.log('MENU ITEM UPSERT DATA', menuItemUpsertData);
+
+    // const newMenuItem = await prisma.menuItem.upsert({
+    //   where: { slug: menuItem.slug },
+    //   update: menuItemUpsertData,
+    //   create: menuItemUpsertData,
+    // });
+
+    // console.log(`New place: ${newMenuItem.name} in ${place.name}`);
   }
 }
 
