@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
-import { dataMenuItems } from './data/menuItems'; // Added import for dataMenuItems
-import { dataPlaces } from './data/places'; // Added import for dataPlaces
+import { dataMenuItems } from './data/menuItems'; 
+import { dataPlaces } from './data/places'; 
 import { dataUsers } from './data/users';
 import { hashPassword } from '../src/utils/password';
 
@@ -102,17 +102,29 @@ async function seedMenuItems() {
       ...menuItemData,
       place: { connect: { id: place.id } },
       user: { connect: { id: user.id } },
-      images: { createOrConnect: images },
+      images: {
+        create: images.map((image) => ({ url: image.url })),
+      },
     };
+
+    const newMenuItem = await prisma.menuItem.upsert({
+      where: { slug: menuItem.slug },
+      update: menuItemUpsertData,
+      create: menuItemUpsertData,
+    });
+
+    console.log(`New menu item: ${newMenuItem.name} in ${place.name}`);
   }
+
+  console.log('Menu Items seeded successfully');
 }
 
 async function main() {
   try {
     await seedUsers();
     await seedCities();
-    await seedPlaces(); // Added call to seedPlaces
-    await seedMenuItems(); // Added call to seedMenuItems
+    await seedPlaces(); 
+    await seedMenuItems(); 
   } catch (e) {
     console.error('❌ Seeding error:', e);
     process.exit(1);
