@@ -98,10 +98,6 @@ async function seedMenuItems() {
       continue;
     }
 
-    // const imagesUrl = images.map((image) => {
-    //   return { where: { url: image.url }, create: { url: image.url } };
-    // });
-
     const menuItemUpsertData = {
       ...menuItemData,
       place: { connect: { id: place.id } },
@@ -110,6 +106,20 @@ async function seedMenuItems() {
         create: images.map((image) => ({ url: image.url })),
       },
     };
+
+    // const menuItemUpsertData = {
+    //   ...menuItemData,
+    //   place: { connect: { id: place.id } },
+    //   user: { connect: { id: user.id } },
+    //   images: {
+    //     connectOrCreate: images.map((image) => ({
+    //       where: { url: image.url },
+    //       create: {
+    //         url: image.url,
+    //       },
+    //     })),
+    //   },
+    // };
 
     const newMenuItem = await prisma.menuItem.upsert({
       where: { slug: menuItem.slug },
