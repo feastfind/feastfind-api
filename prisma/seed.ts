@@ -98,11 +98,9 @@ async function seedMenuItems() {
       continue;
     }
 
-    const imagesUrl = images.map((image) => {
-      return { where: { url: image.url }, create: { url: image.url } };
-    });
-
-    console.log(imagesUrl);
+    // const imagesUrl = images.map((image) => {
+    //   return { where: { url: image.url }, create: { url: image.url } };
+    // });
 
     const menuItemUpsertData = {
       ...menuItemData,
