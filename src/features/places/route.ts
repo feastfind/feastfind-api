@@ -3,6 +3,7 @@ import { PlaceSchema } from '../../../prisma/generated/zod';
 import { handleErrorResponse } from '../../utils/handleError';
 import { getPlaceByParam, getPlaces } from './service';
 import { API_TAGS } from '../../config/config';
+import { Prisma } from '@prisma/client';
 
 const placesRoute = new OpenAPIHono();
 
@@ -15,7 +16,14 @@ placesRoute.openapi(
     responses: {
       200: {
         description: 'Places retrieved successfully',
-        content: { 'application/json': { schema: PlaceSchema.array() } },
+        content: {
+          'application/json': {
+            schema: PlaceSchema.extend({
+              priceMin: z.string().refine((val) => Number(val)),
+              priceMax: z.string().refine((val) => Number(val)),
+            }).array(),
+          },
+        },
       },
       500: {
         description: 'Failed to retrieve cities',
