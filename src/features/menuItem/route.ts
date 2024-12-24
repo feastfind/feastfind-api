@@ -19,7 +19,13 @@ menuItemsRoute.openapi(
     responses: {
       200: {
         description: 'Menu Items retrieved successfully',
-        content: { 'application/json': { schema: MenuItemSchema.array() } },
+        content: {
+          'application/json': {
+            schema: MenuItemSchema.extend({
+              price: z.string().refine((val) => Number(val)),
+            }).array(),
+          },
+        },
       },
       500: {
         description: 'Failed to retrieve menu items',
@@ -55,7 +61,13 @@ menuItemsRoute.openapi(
     responses: {
       200: {
         description: 'Menu item retrieved successfully',
-        content: { 'application/json': { schema: MenuItemSchema } },
+        content: {
+          'application/json': {
+            schema: MenuItemSchema.extend({
+              price: z.string().refine((val) => Number(val)),
+            }),
+          },
+        },
       },
       400: {
         description: 'Invalid param',

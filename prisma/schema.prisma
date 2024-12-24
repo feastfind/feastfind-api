@@ -66,6 +66,7 @@ model MenuItem {
 
   slug        String  @unique @db.VarChar(255)
   name        String  @db.VarChar(255)
+  price       Decimal @default(0) @db.Money
   description String? @db.Text
 
   images  MenuItemImage[]
