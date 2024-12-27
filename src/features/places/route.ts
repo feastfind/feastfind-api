@@ -1,8 +1,10 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { PlaceSchema } from '../../../prisma/generated/zod';
-import { handleErrorResponse } from '../../utils/handleError';
-import { getPlaceByParam, getPlaces } from './service';
 import { API_TAGS } from '../../config/config';
+import { authenticateUser } from '../../middlewares/authenticateUser';
+import { handleErrorResponse } from '../../utils/handleError';
+import { CreatePlaceSchema } from './schema';
+import { createPlace, getPlaceByParam, getPlaces } from './service';
 
 const placesRoute = new OpenAPIHono();
 
@@ -79,68 +81,79 @@ placesRoute.openapi(
   }
 );
 
-// placesRoute.openapi(
-//   {
-//     method: 'post',
-//     path: '/',
-//     description: 'Add a new place.',
-//     tags: API_TAGS,
-//     middleware: authenticateUser,
-//     responses: {
-//       201: {
-//         description: 'Place created successfully',
-//         content: { 'application/json': { schema: PlaceSchema } },
-//       },
-//       400: {
-//         description: 'Validation error',
-//       },
-//       404: {
-//         description: 'Place not found',
-//       },
-//       500: {
-//         description: 'Failed to create place',
-//       },
-//     },
-//   },
-//   async (c) => {
-//     try {
-//       const data = await c.req.json();
-//       const parsed = PlaceCreateWithoutCityInputSchema.safeParse(data);
+placesRoute.openapi(
+  {
+    method: 'post',
+    path: '/',
+    description: 'Add a new place.',
+    tags: API_TAGS.PLACE,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: CreatePlaceSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Place created successfully',
+        content: { 'application/json': { schema: PlaceSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Place not found',
+      },
+      500: {
+        description: 'Failed to create place',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const user = c.get('user');
 
-//       if (!parsed.success) {
-//         return handleErrorResponse(
-//           c,
-//           `Validation error: ${parsed.error.message}`,
-//           400
-//         );
-//       }
+      const {
+        name,
+        description,
+        priceMin,
+        priceMax,
+        city,
+        address,
+        latitude,
+        longitude,
+      } = c.req.valid('json');
 
-//       const {
-//         slug,
-//         name,
-//         description,
-//         priceMin,
-//         priceMax,
-//         address,
-//         latitude,
-//         longitude,
-//       } = parsed.data;
+      const username = user.username;
 
-//       const place = await createPlace(
-//         slug,
-//         name,
-//         description ?? "",
-//         priceMin,
-//         priceMax,
-//         address,
-//         latitude,
-//         longitude
-//       );
+      const place = await createPlace(
+        name,
+        description ?? '',
+        priceMin,
+        priceMax,
+        city,
+        address,
+        latitude,
+        longitude,
+        username
+      );
 
-//     } catch (error) {
-//       return handleErrorResponse(c, `Failed to create place: ${error} `, 500);
-//     }
-//   }
-// );
+      return c.json(
+        {
+          message: 'Place created successfully',
+          place,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(c, `Failed to create place: ${error} `, 500);
+    }
+  }
+);
 
 export { placesRoute };

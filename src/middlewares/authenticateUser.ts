@@ -7,6 +7,10 @@ type Env = {
   Variables: {
     user: {
       id: string;
+      name: string;
+      username: string;
+      email: string;
+      avatarURL: string;
     };
   };
 };
@@ -33,14 +37,20 @@ export const authenticateUser = createMiddleware<Env>(async (c, next) => {
   const user = await prisma.user.findUnique({
     where: {
       id: payload.userId,
-    },
+    }
   });
 
   if (!user) {
     return handleErrorResponse(c, 'User not found', 401);
   }
 
-  c.set('user', user);
+  c.set('user', {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    avatarURL: user.avatarURL ?? ''
+  });
 
   await next();
 });
