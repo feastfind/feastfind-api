@@ -53,6 +53,6 @@ app.route('/users', usersRoute);
 app.route('/cities', citiesRoute);
 app.route('/auth', authRoute);
 app.route('/places', placesRoute);
-app.route('/menuItem', menuItemsRoute);
+app.route('/menu-items', menuItemsRoute);
 
 export default app;

@@ -7,6 +7,6 @@ export const API_TAGS = {
   USER: ['User'],
   CITY: ['City'],
   PLACE: ['Place'],
-  MENU_ITEM: ['MenuItem'],
-  MENU_ITEM_REVIEW: ['MenuItemReview'],
+  MENU_ITEM: ['Menu Item'],
+  MENU_ITEM_REVIEW: ['Menu Item Review'],
 }
