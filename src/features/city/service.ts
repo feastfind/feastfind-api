@@ -13,3 +13,29 @@ export const getCityByParam = async (param: string): Promise<City | null> => {
     where: isCUID ? { id: param } : { slug: param },
   });
 };
+
+export const isCitySlugExist = async (slug: string): Promise<boolean> => {
+  const city = await prisma.city.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  return city !== null;
+};
+
+export const createCity = async (
+  slug: string,
+  name: string,
+  latitude: number,
+  longitude: number
+): Promise<City> => {
+  return await prisma.city.create({
+    data: {
+      slug: slug,
+      name,
+      latitude,
+      longitude,
+    },
+  });
+};

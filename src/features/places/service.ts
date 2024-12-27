@@ -1,6 +1,8 @@
 import { Place } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 import { isValidCUID } from '../../utils/regex';
+import { generateSlug } from '../../utils/slug';
+import { createCity, isCitySlugExist } from '../city/service';
 
 export const getPlaces = async (): Promise<Place[]> => {
   return await prisma.place.findMany();
@@ -14,37 +16,88 @@ export const getPlaceByParam = async (param: string): Promise<Place | null> => {
   });
 };
 
-// export const createPlace = async (
-//   name: string,
-//   description: string,
-//   priceMin: number,
-//   priceMax: number,
-//   city: string,
-//   address: string,
-// ): Promise<Partial<Place>> => {
-//   const coordinate = await getCoordinate(city, address);
+export const createPlace = async (
+  name: string,
+  description: string,
+  priceMin: number,
+  priceMax: number,
+  city: string,
+  address: string,
+  latitude: number,
+  longitude: number,
+  username: string
+): Promise<Partial<Place>> => {
+  const placeSlug = generateSlug(name);
+  const isPlaceExist = await isPlaceSlugExist(placeSlug);
 
-//   if (!coordinate) {
-//     throw new Error('Failed to get coordinate');
-//   }
+  if (isPlaceExist) {
+    throw new Error('Place already exists');
+  }
 
-//   const { lat, lon } = coordinate;
+  const citySlug = generateSlug(city);
+  const isCityExist = await isCitySlugExist(citySlug);
 
-//   // generate slug
-//   // create city -> validate city name (getLoc?)
+  let newPlace;
 
-//   const newPlace = await prisma.place.create({
-//     data: {
-//       slug,
-//       name,
-//       description,
-//       priceMin,
-//       priceMax,
-//       address,
-//       latitude: lat,
-//       longitude: lon,
-//     },
+  if (!isCityExist) {
+    const newCity = await createCity(citySlug, city, latitude, longitude);
 
-//   });
+    newPlace = await prisma.place.create({
+      data: {
+        slug: placeSlug,
+        name,
+        description,
+        priceMin: priceMin,
+        priceMax: priceMax,
+        city: {
+          connect: {
+            id: newCity.id,
+          },
+        },
+        address,
+        latitude,
+        longitude,
+        user: {
+          connect: {
+            username,
+          },
+        },
+      },
+    });
+  } else {
+    newPlace = await prisma.place.create({
+      data: {
+        slug: placeSlug,
+        name,
+        description,
+        priceMin: priceMin,
+        priceMax: priceMax,
+        city: {
+          connect: {
+            slug: citySlug,
+          },
+        },
+        address,
+        latitude,
+        longitude,
+        user: {
+          connect: {
+            username,
+          },
+        },
+      },
+    });
+  }
 
-// };
+  return newPlace;
+};
+
+export const isPlaceSlugExist = async (slug: string): Promise<boolean> => {
+  const place = await prisma.place.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  return place !== null;
+};
