@@ -1,6 +1,5 @@
 import { Place } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
-import { isValidCUID } from '../../utils/regex';
 import { generateSlug } from '../../utils/slug';
 import { createCity, isCitySlugExist } from '../city/service';
 
@@ -9,10 +8,10 @@ export const getPlaces = async (): Promise<Place[]> => {
 };
 
 export const getPlaceByParam = async (param: string): Promise<Place | null> => {
-  const isCUID = isValidCUID(param);
-
-  return await prisma.place.findUnique({
-    where: isCUID ? { id: param } : { slug: param },
+  return await prisma.place.findFirst({
+    where: {
+      OR: [{ id: param }, { slug: param }],
+    },
   });
 };
 
