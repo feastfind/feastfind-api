@@ -33,7 +33,7 @@ model Password {
   id     String @id @default(cuid())
   hash   String @unique
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Place {
@@ -49,12 +49,12 @@ model Place {
   menuItems MenuItem[]
 
   cityId    String
-  city      City   @relation(fields: [cityId], references: [id])
+  city      City   @relation(fields: [cityId], references: [id], onDelete: Cascade)
   address   String @db.Text
   latitude  Float
   longitude Float
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   createdAt DateTime @default(now())
@@ -66,15 +66,16 @@ model MenuItem {
 
   slug        String  @unique @db.VarChar(255)
   name        String  @db.VarChar(255)
+  price       Decimal @default(0) @db.Money
   description String? @db.Text
 
   images  MenuItemImage[]
   reviews MenuItemReview[]
 
   placeId String
-  place   Place  @relation(fields: [placeId], references: [id])
+  place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   createdAt DateTime @default(now())
@@ -84,29 +85,31 @@ model MenuItem {
 model MenuItemImage {
   id String @id @default(cuid())
 
-  url String @db.Text
+  url String @unique @db.Text
 
   menuItemId String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model MenuItemReview {
-  id String @id @default(cuid())
+  // id String @id @default(cuid())
 
-  menuItemId String?
-  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id])
+  menuItemId String
+  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   rating  Int
   comment String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@id([menuItemId, userId])
 }
 
 model City {

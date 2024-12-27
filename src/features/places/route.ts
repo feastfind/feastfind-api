@@ -17,7 +17,14 @@ placesRoute.openapi(
     responses: {
       200: {
         description: 'Places retrieved successfully',
-        content: { 'application/json': { schema: PlaceSchema.array() } },
+        content: {
+          'application/json': {
+            schema: PlaceSchema.extend({
+              priceMin: z.string().refine((val) => Number(val)),
+              priceMax: z.string().refine((val) => Number(val)),
+            }).array(),
+          },
+        },
       },
       500: {
         description: 'Failed to retrieve cities',
@@ -53,7 +60,14 @@ placesRoute.openapi(
     responses: {
       200: {
         description: 'Place retrieved successfully',
-        content: { 'application/json': { schema: PlaceSchema } },
+        content: {
+          'application/json': {
+            schema: PlaceSchema.extend({
+              priceMin: z.string().refine((val) => Number(val)),
+              priceMax: z.string().refine((val) => Number(val)),
+            }),
+          },
+        },
       },
       400: {
         description: 'Invalid place slug',

@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { dataCities } from './data/cities';
-import { dataMenuItems } from './data/menuItems'; 
-import { dataPlaces } from './data/places'; 
+import { dataMenuItems } from './data/menuItems';
+import { dataPlaces } from './data/places';
 import { dataUsers } from './data/users';
+import { dataMenuItemsReview } from './data/menuItemsReview';
 import { hashPassword } from '../src/utils/password';
 
 const prisma = new PrismaClient();
@@ -29,11 +30,9 @@ async function seedUsers() {
         password: { create: { hash: hashedPassword } },
       },
     });
-
-    console.log(`New user: ${newUser.email}`);
   }
 
-  console.log('Users seeded successfully \n');
+  console.log('Users seeded successfully');
 }
 
 async function seedCities() {
@@ -43,11 +42,9 @@ async function seedCities() {
       update: city,
       create: city,
     });
-
-    console.log(`New city: ${newCity.name}`);
   }
 
-  console.log('Cities seeded successfully \n');
+  console.log('Cities seeded successfully');
 }
 
 async function seedPlaces() {
@@ -75,8 +72,6 @@ async function seedPlaces() {
       update: placeUpsertData,
       create: placeUpsertData,
     });
-
-    console.log(`New place: ${newPlace.name} in ${city.name}`);
   }
 
   console.log('Places seeded successfully');
@@ -103,28 +98,69 @@ async function seedMenuItems() {
       place: { connect: { id: place.id } },
       user: { connect: { id: user.id } },
       images: {
-        create: images.map((image) => ({ url: image.url })),
+        connectOrCreate: images.map((image) => ({
+          where: { url: image.url },
+          create: {
+            url: image.url,
+          },
+        })),
       },
     };
 
-    const newMenuItem = await prisma.menuItem.upsert({
+    await prisma.menuItem.upsert({
       where: { slug: menuItem.slug },
       update: menuItemUpsertData,
       create: menuItemUpsertData,
     });
-
-    console.log(`New menu item: ${newMenuItem.name} in ${place.name}`);
   }
 
   console.log('Menu Items seeded successfully');
+}
+
+async function seedMenuItemsReview() {
+  for (const menuItemReview of dataMenuItemsReview) {
+    const { menuItemSlug, username, ...menuItemReviewData } = menuItemReview;
+
+    const [menuItem, user] = await Promise.all([
+      prisma.menuItem.findUnique({ where: { slug: menuItemSlug } }),
+      prisma.user.findUnique({ where: { username } }),
+    ]);
+
+    if (!menuItem || !user) {
+      console.log(
+        `Skipping menu Item ${menuItem?.name} - menu Item or user not found`
+      );
+      continue;
+    }
+
+    const menuItemReviewUpsertData = {
+      ...menuItemReviewData,
+      menuItem: { connect: { id: menuItem.id } },
+      user: { connect: { id: user.id } },
+    };
+
+    await prisma.menuItemReview.upsert({
+      where: {
+        menuItemId_userId: {
+          menuItemId: menuItem.id,
+          userId: user.id,
+        },
+      },
+      update: menuItemReviewUpsertData,
+      create: menuItemReviewUpsertData,
+    });
+  }
+
+  console.log('Reviews seeded successfully');
 }
 
 async function main() {
   try {
     await seedUsers();
     await seedCities();
-    await seedPlaces(); 
-    await seedMenuItems(); 
+    await seedPlaces();
+    await seedMenuItems();
+    await seedMenuItemsReview();
   } catch (e) {
     console.error('❌ Seeding error:', e);
     process.exit(1);
