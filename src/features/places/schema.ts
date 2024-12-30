@@ -1,4 +1,22 @@
 import { z } from 'zod';
+import { PlaceSchema } from '../../../prisma/generated/zod';
+
+export const GetPlacesSchema = z.object({
+  count: z.number(),
+  place: PlaceSchema.extend({
+    priceMin: z.string().refine((val) => Number(val)),
+    priceMax: z.string().refine((val) => Number(val)),
+  }).array(),
+});
+
+export const GetPlacesBySlugSchema = PlaceSchema.extend({
+  priceMin: z.string().refine((val) => Number(val)),
+  priceMax: z.string().refine((val) => Number(val)),
+});
+
+export const GetPlacesBySlugRequestSchema = z.object({
+  param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+});
 
 export const CreatePlaceSchema = z.object({
   name: z.string(),

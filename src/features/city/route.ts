@@ -1,8 +1,9 @@
-import { OpenAPIHono, z } from '@hono/zod-openapi';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import { CitySchema } from '../../../prisma/generated/zod';
-import { handleErrorResponse } from '../../utils/handleError';
-import { getCities, getCityByParam } from './service';
 import { API_TAGS } from '../../config/config';
+import { handleErrorResponse } from '../../utils/handleError';
+import { GetCitiesBySlugRequestSchema, GetCitiesSchema } from './schema';
+import { getCities, getCityByParam } from './service';
 
 const citiesRoute = new OpenAPIHono();
 
@@ -15,7 +16,11 @@ citiesRoute.openapi(
     responses: {
       200: {
         description: 'Cities retrieved successfully',
-        content: { 'application/json': { schema: CitySchema.array() } },
+        content: {
+          'application/json': {
+            schema: GetCitiesSchema,
+          },
+        },
       },
       500: {
         description: 'Failed to retrieve cities',
@@ -24,9 +29,15 @@ citiesRoute.openapi(
   },
   async (c) => {
     try {
-      const result = await getCities();
+      const { cities, count } = await getCities();
 
-      return c.json(result, 200);
+      return c.json(
+        {
+          count,
+          cities,
+        },
+        200
+      );
     } catch (error) {
       return handleErrorResponse(
         c,
@@ -44,9 +55,7 @@ citiesRoute.openapi(
     description: 'Get a city by param.',
     tags: API_TAGS.CITY,
     request: {
-      params: z.object({
-        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
-      }),
+      params: GetCitiesBySlugRequestSchema,
     },
     responses: {
       200: {

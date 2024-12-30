@@ -1,8 +1,14 @@
 import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 
-export const getMenuItems = async (): Promise<MenuItem[]> => {
-  return await prisma.menuItem.findMany();
+export const getMenuItems = async (): Promise<{
+  menuItems: MenuItem[];
+  count: number;
+}> => {
+  const menuItems = await prisma.menuItem.findMany();
+  const count = await prisma.menuItem.count();
+
+  return { menuItems, count };
 };
 
 export const getMenuItemByParam = async (
@@ -17,10 +23,18 @@ export const getMenuItemByParam = async (
 
 export const getMenuItemReviewsByMenuItemParam = async (
   menuItemId: string
-): Promise<MenuItemReview[]> => {
-  return await prisma.menuItemReview.findMany({
+): Promise<{ menuItemReviews: MenuItemReview[]; count: number }> => {
+  const menuItemReviews = await prisma.menuItemReview.findMany({
     where: {
       menuItemId,
     },
   });
+
+  const count = await prisma.menuItemReview.count({
+    where: {
+      menuItemId,
+    },
+  });
+
+  return { menuItemReviews, count };
 };

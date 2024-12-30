@@ -3,8 +3,14 @@ import prisma from '../../lib/db';
 import { generateSlug } from '../../utils/slug';
 import { createCity, isCitySlugExist } from '../city/service';
 
-export const getPlaces = async (): Promise<Place[]> => {
-  return await prisma.place.findMany();
+export const getPlaces = async (): Promise<{
+  places: Place[];
+  count: number;
+}> => {
+  const places = await prisma.place.findMany();
+  const count = await prisma.place.count();
+
+  return { places, count };
 };
 
 export const getPlaceByParam = async (param: string): Promise<Place | null> => {
