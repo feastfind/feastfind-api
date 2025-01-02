@@ -1,26 +1,40 @@
 import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
-import { isValidCUID } from '../../utils/regex';
 
-export const getMenuItems = async (): Promise<MenuItem[]> => {
-  return await prisma.menuItem.findMany();
+export const getMenuItems = async (): Promise<{
+  menuItems: MenuItem[];
+  count: number;
+}> => {
+  const menuItems = await prisma.menuItem.findMany();
+  const count = await prisma.menuItem.count();
+
+  return { menuItems, count };
 };
 
 export const getMenuItemByParam = async (
   param: string
 ): Promise<MenuItem | null> => {
-  const isCUID = isValidCUID(param);
-
-  return await prisma.menuItem.findUnique({
-    where: isCUID ? { id: param } : { slug: param },
+  return await prisma.menuItem.findFirst({
+    where: {
+      OR: [{ id: param }, { slug: param }],
+    },
   });
 };
 
 export const getMenuItemReviewsByMenuItemParam = async (
   menuItemId: string
-): Promise<MenuItemReview[] | null> =>
-  await prisma.menuItemReview.findMany({
+): Promise<{ menuItemReviews: MenuItemReview[]; count: number }> => {
+  const menuItemReviews = await prisma.menuItemReview.findMany({
     where: {
       menuItemId,
     },
   });
+
+  const count = await prisma.menuItemReview.count({
+    where: {
+      menuItemId,
+    },
+  });
+
+  return { menuItemReviews, count };
+};

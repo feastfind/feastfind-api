@@ -1,8 +1,12 @@
-import { OpenAPIHono, z } from '@hono/zod-openapi';
-import { UserSchema } from '../../../prisma/generated/zod';
-import { handleErrorResponse } from '../../utils/handleError';
-import { getAllUsers, getUserByParam } from './service';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import { API_TAGS } from '../../config/config';
+import { handleErrorResponse } from '../../utils/handleError';
+import {
+  GetUserByUsernameRequestSchema,
+  GetUserByUsernameSchema,
+  GetUsersSchema,
+} from './schema';
+import { getAllUsers, getUserByParam } from './service';
 
 const usersRoute = new OpenAPIHono();
 
@@ -15,16 +19,22 @@ usersRoute.openapi(
     responses: {
       200: {
         description: 'Get all users',
-        content: { 'application/json': { schema: UserSchema.array() } },
+        content: { 'application/json': { schema: GetUsersSchema } },
       },
       500: { description: 'Failed to get all users' },
     },
   },
   async (c) => {
     try {
-      const users = await getAllUsers();
+      const { users, count } = await getAllUsers();
 
-      return c.json(users, 200);
+      return c.json(
+        {
+          count,
+          users,
+        },
+        200
+      );
     } catch (error) {
       return handleErrorResponse(c, `Failed to get all users: ${error}`, 500);
     }
@@ -34,21 +44,16 @@ usersRoute.openapi(
 usersRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a user by param.',
+    path: '/{username}',
+    description: 'Get a user by username.',
     tags: API_TAGS.USER,
     request: {
-      params: z.object({
-        param: z
-          .string()
-          .max(255)
-          .openapi({ description: 'param: username | id | email' }),
-      }),
+      params: GetUserByUsernameRequestSchema,
     },
     responses: {
       200: {
         description: 'User retrieved successfully',
-        content: { 'application/json': { schema: UserSchema.array() } },
+        content: { 'application/json': { schema: GetUserByUsernameSchema } },
       },
       400: { description: 'Invalid param' },
       404: { description: 'User not found' },

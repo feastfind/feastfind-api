@@ -1,12 +1,18 @@
-import { OpenAPIHono, z } from '@hono/zod-openapi';
-import { MenuItemSchema } from '../../../prisma/generated/zod';
+import { OpenAPIHono } from '@hono/zod-openapi';
+import { API_TAGS } from '../../config/config';
 import { handleErrorResponse } from '../../utils/handleError';
+import {
+  GetMenuItemReviewsBySlug,
+  GetMenuItemReviewsBySlugRequestSchema,
+  GetMenuItemsBySlugRequestSchema,
+  GetMenuItemsBySlugSchema,
+  GetMenuItemsSchema,
+} from './schema';
 import {
   getMenuItemByParam,
   getMenuItemReviewsByMenuItemParam,
   getMenuItems,
 } from './service';
-import { API_TAGS } from '../../config/config';
 
 const menuItemsRoute = new OpenAPIHono();
 
@@ -21,9 +27,7 @@ menuItemsRoute.openapi(
         description: 'Menu Items retrieved successfully',
         content: {
           'application/json': {
-            schema: MenuItemSchema.extend({
-              price: z.string().refine((val) => Number(val)),
-            }).array(),
+            schema: GetMenuItemsSchema,
           },
         },
       },
@@ -34,9 +38,15 @@ menuItemsRoute.openapi(
   },
   async (c) => {
     try {
-      const result = await getMenuItems();
+      const { menuItems, count } = await getMenuItems();
 
-      return c.json(result, 200);
+      return c.json(
+        {
+          count,
+          menuItems,
+        },
+        200
+      );
     } catch (error) {
       return handleErrorResponse(
         c,
@@ -50,22 +60,18 @@ menuItemsRoute.openapi(
 menuItemsRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a menu item by param.',
+    path: '/{slug}',
+    description: 'Get a menu item by slug.',
     tags: API_TAGS.MENU_ITEM,
     request: {
-      params: z.object({
-        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
-      }),
+      params: GetMenuItemsBySlugRequestSchema,
     },
     responses: {
       200: {
         description: 'Menu item retrieved successfully',
         content: {
           'application/json': {
-            schema: MenuItemSchema.extend({
-              price: z.string().refine((val) => Number(val)),
-            }),
+            schema: GetMenuItemsBySlugSchema,
           },
         },
       },
@@ -102,21 +108,16 @@ menuItemsRoute.openapi(
 menuItemsRoute.openapi(
   {
     method: 'get',
-    path: '/{param}/reviews',
-    description: 'Get menu item reviews by menu param.',
+    path: '/{slug}/reviews',
+    description: 'Get menu item reviews by menu item slug.',
     tags: API_TAGS.MENU_ITEM_REVIEW,
     request: {
-      params: z.object({
-        param: z
-          .string()
-          .max(255)
-          .openapi({ description: 'param: menu slug | menu id' }),
-      }),
+      params: GetMenuItemReviewsBySlugRequestSchema,
     },
     responses: {
       200: {
         description: 'Menu item reviews retrieved successfully',
-        content: { 'application/json': { schema: MenuItemSchema } },
+        content: { 'application/json': { schema: GetMenuItemReviewsBySlug } },
       },
       400: {
         description: 'Invalid menu param',
@@ -137,14 +138,19 @@ menuItemsRoute.openapi(
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
-      const menuItemReviews = await getMenuItemReviewsByMenuItemParam(
-        menuItem.id
-      );
+      const { menuItemReviews, count } =
+        await getMenuItemReviewsByMenuItemParam(menuItem.id);
 
       if (!menuItemReviews)
         return handleErrorResponse(c, 'Menu item reviews not found', 404);
 
-      return c.json(menuItemReviews, 200);
+      return c.json(
+        {
+          menuItemReviews,
+          count,
+        },
+        200
+      );
     } catch (error) {
       return handleErrorResponse(
         c,

@@ -1,11 +1,15 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { UserSchema } from '../../../prisma/generated/zod';
+import { API_TAGS } from '../../config/config';
 import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
-import { LoginUserSchema, RegisterUserSchema } from './schema';
+import {
+  LoginUserRequestSchema,
+  LoginUserSchema,
+  RegisterUserRequestSchema,
+  RegisterUserSchema,
+} from './schema';
 import { loginUser, registerUser } from './service';
 import { getDiceBearAvatar } from './utils';
-import { API_TAGS } from '../../config/config';
 
 const authRoute = new OpenAPIHono();
 
@@ -19,7 +23,7 @@ authRoute.openapi(
       body: {
         content: {
           'application/json': {
-            schema: RegisterUserSchema,
+            schema: RegisterUserRequestSchema,
           },
         },
       },
@@ -27,7 +31,7 @@ authRoute.openapi(
     responses: {
       201: {
         description: 'User registered successfully',
-        content: { 'application/json': { schema: UserSchema } },
+        content: { 'application/json': { schema: RegisterUserSchema } },
       },
       400: {
         description: 'Validation error',
@@ -73,7 +77,7 @@ authRoute.openapi(
       body: {
         content: {
           'application/json': {
-            schema: LoginUserSchema,
+            schema: LoginUserRequestSchema,
           },
         },
       },
@@ -81,7 +85,7 @@ authRoute.openapi(
     responses: {
       200: {
         description: 'User logged in successfully',
-        content: { 'application/json': { schema: UserSchema } },
+        content: { 'application/json': { schema: LoginUserSchema } },
       },
       400: {
         description: 'Validation error',
