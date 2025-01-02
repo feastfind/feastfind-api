@@ -60,8 +60,8 @@ menuItemsRoute.openapi(
 menuItemsRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a menu item by param.',
+    path: '/{slug}',
+    description: 'Get a menu item by slug.',
     tags: API_TAGS.MENU_ITEM,
     request: {
       params: GetMenuItemsBySlugRequestSchema,
@@ -108,8 +108,8 @@ menuItemsRoute.openapi(
 menuItemsRoute.openapi(
   {
     method: 'get',
-    path: '/{param}/reviews',
-    description: 'Get menu item reviews by menu param.',
+    path: '/{slug}/reviews',
+    description: 'Get menu item reviews by menu item slug.',
     tags: API_TAGS.MENU_ITEM_REVIEW,
     request: {
       params: GetMenuItemReviewsBySlugRequestSchema,

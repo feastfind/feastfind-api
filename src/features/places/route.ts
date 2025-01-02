@@ -57,8 +57,8 @@ placesRoute.openapi(
 placesRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a place by param.',
+    path: '/{slug}',
+    description: 'Get a place by slug.',
     tags: API_TAGS.PLACE,
     request: {
       params: GetPlacesBySlugRequestSchema,

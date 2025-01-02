@@ -1,8 +1,11 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { CitySchema } from '../../../prisma/generated/zod';
 import { API_TAGS } from '../../config/config';
 import { handleErrorResponse } from '../../utils/handleError';
-import { GetCitiesBySlugRequestSchema, GetCitiesSchema } from './schema';
+import {
+  GetCitiesBySlugRequestSchema,
+  GetCitiesBySlugSchema,
+  GetCitiesSchema,
+} from './schema';
 import { getCities, getCityByParam } from './service';
 
 const citiesRoute = new OpenAPIHono();
@@ -51,8 +54,8 @@ citiesRoute.openapi(
 citiesRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a city by param.',
+    path: '/{slug}',
+    description: 'Get a city by slug.',
     tags: API_TAGS.CITY,
     request: {
       params: GetCitiesBySlugRequestSchema,
@@ -60,10 +63,10 @@ citiesRoute.openapi(
     responses: {
       200: {
         description: 'City retrieved successfully',
-        content: { 'application/json': { schema: CitySchema } },
+        content: { 'application/json': { schema: GetCitiesBySlugSchema } },
       },
       400: {
-        description: 'Invalid param',
+        description: 'Invalid slug',
       },
       404: {
         description: 'City not found',

@@ -6,11 +6,11 @@ export const GetUsersSchema = z.object({
   users: UserSchema.array(),
 });
 
-export const GetUserBySlugRequestSchema = z.object({
+export const GetUserByUsernameRequestSchema = z.object({
   param: z
     .string()
     .max(255)
     .openapi({ description: 'param: username | id | email' }),
 });
 
-export const GetUserBySlugSchema = UserSchema;
+export const GetUserByUsernameSchema = UserSchema;

@@ -14,7 +14,7 @@ export const getCities = async (): Promise<{
 export const getCityByParam = async (param: string): Promise<City | null> => {
   return await prisma.city.findFirst({
     where: {
-      OR: [{ id: param }, { slug: param }],
+      OR: [{ slug: param }, { id: param }],
     },
   });
 };

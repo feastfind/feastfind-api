@@ -2,8 +2,8 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { API_TAGS } from '../../config/config';
 import { handleErrorResponse } from '../../utils/handleError';
 import {
-  GetUserBySlugRequestSchema,
-  GetUserBySlugSchema,
+  GetUserByUsernameRequestSchema,
+  GetUserByUsernameSchema,
   GetUsersSchema,
 } from './schema';
 import { getAllUsers, getUserByParam } from './service';
@@ -44,16 +44,16 @@ usersRoute.openapi(
 usersRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a user by param.',
+    path: '/{username}',
+    description: 'Get a user by username.',
     tags: API_TAGS.USER,
     request: {
-      params: GetUserBySlugRequestSchema,
+      params: GetUserByUsernameRequestSchema,
     },
     responses: {
       200: {
         description: 'User retrieved successfully',
-        content: { 'application/json': { schema: GetUserBySlugSchema } },
+        content: { 'application/json': { schema: GetUserByUsernameSchema } },
       },
       400: { description: 'Invalid param' },
       404: { description: 'User not found' },
