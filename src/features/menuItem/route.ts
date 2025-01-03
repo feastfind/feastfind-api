@@ -4,6 +4,7 @@ import { API_TAGS } from '../../config/config';
 import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
 import {
+  CreateMenuItemReviewSchema,
   CreateMenuItemSchema,
   GetMenuItemReviewsBySlug,
   GetMenuItemReviewsBySlugRequestSchema,
@@ -13,6 +14,7 @@ import {
 } from './schema';
 import {
   createMenuItem,
+  createMenuItemReview,
   getMenuItemByParam,
   getMenuItemReviewsByMenuItemParam,
   getMenuItems,
@@ -193,8 +195,8 @@ menuItemsRoute.openapi(
       404: {
         description: 'Place not found',
       },
-      500: {
-        description: 'Failed to create place',
+      500: { 
+        description: 'Failed to create menu item',
       },
     },
   },
@@ -232,5 +234,70 @@ menuItemsRoute.openapi(
     }
   }
 );
+
+menuItemsRoute.openapi(
+  {
+    method: 'post',
+    path: '/{slug}/reviews',
+    description: 'Add a new menu item review.',
+    tags: API_TAGS.MENU_ITEM_REVIEW,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: CreateMenuItemReviewSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Menu item review created successfully',
+        content: { 'application/json': { schema: MenuItemSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Menu item not found',
+      },
+      500: {
+        description: 'Failed to create menu item review',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const user = c.get('user');
+
+      const { menuItemId, rating, comment } =
+        c.req.valid('json');
+
+      const menuItemReview = await createMenuItemReview(
+        menuItemId,
+        user.id,
+        rating,
+        comment ?? ''
+      );
+
+      return c.json(
+        {
+          message: 'Menu Item review created successfully',
+          menuItemReview,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(
+        c,
+        `Failed to create menu item review: ${error} `,
+        500
+      );
+    }
+  }
+);
+
 
 export { menuItemsRoute };
