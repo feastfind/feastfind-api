@@ -90,6 +90,22 @@ export const createMenuItem = async (
   return newMenuItem;
 };
 
+export const createMenuItemReview = async (
+  menuItemId: string,
+  userId: string,
+  rating: number,
+  comment: string
+): Promise<Partial<MenuItemReview>> => (
+  await prisma.menuItemReview.create({
+    data: {
+      menuItemId: menuItemId,
+      userId: userId,
+      rating,
+      comment,
+    },
+  })
+)
+
 export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
   const menuItem = await prisma.menuItem.findUnique({
     where: {

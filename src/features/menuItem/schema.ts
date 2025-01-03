@@ -35,3 +35,9 @@ export const CreateMenuItemSchema = z.object({
   images: z.array(z.object({ url: z.string() })),
   placeSlug: z.string(),
 });
+
+export const CreateMenuItemReviewSchema = z.object({
+  menuItemId: z.string(),
+  rating: z.number(),
+  comment: z.string().nullable(),
+});
