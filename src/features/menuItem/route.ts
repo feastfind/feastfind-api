@@ -92,9 +92,9 @@ menuItemsRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(param);
+      const menuItem = await getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
@@ -136,9 +136,9 @@ menuItemsRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(param);
+      const menuItem = await getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 

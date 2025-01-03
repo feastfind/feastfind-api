@@ -7,7 +7,7 @@ export const GetUsersSchema = z.object({
 });
 
 export const GetUserByUsernameRequestSchema = z.object({
-  param: z
+  username: z
     .string()
     .max(255)
     .openapi({ description: 'param: username | id | email' }),

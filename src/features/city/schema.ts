@@ -7,7 +7,7 @@ export const GetCitiesSchema = z.object({
 });
 
 export const GetCitiesBySlugRequestSchema = z.object({
-  param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
 });
 
 export const GetCitiesBySlugSchema = CitySchema;

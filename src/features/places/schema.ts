@@ -15,7 +15,7 @@ export const GetPlacesBySlugSchema = PlaceSchema.extend({
 });
 
 export const GetPlacesBySlugRequestSchema = z.object({
-  param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
 });
 
 export const CreatePlaceSchema = z.object({

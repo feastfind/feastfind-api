@@ -85,9 +85,9 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { slug } = c.req.valid('param');
 
-      const place = await getPlaceByParam(param);
+      const place = await getPlaceByParam(slug);
 
       if (!place) return handleErrorResponse(c, 'Place not found', 404);
 
