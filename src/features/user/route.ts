@@ -62,9 +62,9 @@ usersRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { username } = c.req.valid('param');
 
-      const user = await getUserByParam(param);
+      const user = await getUserByParam(username);
 
       if (!user) return handleErrorResponse(c, 'User not found', 404);
 

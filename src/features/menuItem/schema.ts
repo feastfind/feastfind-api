@@ -9,7 +9,7 @@ export const GetMenuItemsSchema = z.object({
 });
 
 export const GetMenuItemsBySlugRequestSchema = z.object({
-  param: z.string().max(255).openapi({ description: 'param: slug | id' }),
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
 });
 
 export const GetMenuItemsBySlugSchema = MenuItemSchema.extend({
@@ -17,7 +17,7 @@ export const GetMenuItemsBySlugSchema = MenuItemSchema.extend({
 });
 
 export const GetMenuItemReviewsBySlugRequestSchema = z.object({
-  param: z
+  slug: z
     .string()
     .max(255)
     .openapi({ description: 'param: menu slug | menu id' }),

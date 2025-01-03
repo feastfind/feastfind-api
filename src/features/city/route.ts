@@ -78,9 +78,9 @@ citiesRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { slug } = c.req.valid('param');
 
-      const city = await getCityByParam(param);
+      const city = await getCityByParam(slug);
 
       if (!city) return handleErrorResponse(c, 'City not found', 404);
 
