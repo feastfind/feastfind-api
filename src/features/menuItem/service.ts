@@ -1,5 +1,7 @@
 import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
+import { generateSlug } from '../../utils/slug';
+import { isPlaceSlugExist } from '../places/service';
 
 export const getMenuItems = async (): Promise<{
   menuItems: MenuItem[];
@@ -37,4 +39,63 @@ export const getMenuItemReviewsByMenuItemParam = async (
   });
 
   return { menuItemReviews, count };
+};
+
+export const createMenuItem = async (
+  name: string,
+  price: number,
+  description: string,
+  images: { url: string }[],
+  username: string,
+  placeSlug: string
+): Promise<Partial<MenuItem>> => {
+  const isPlaceExist = await isPlaceSlugExist(placeSlug);
+
+  // TODO: depending on how the frontend works, we may want to change this 
+  if (!isPlaceExist) {
+    throw new Error('Place not found');
+  }
+
+  const menuItemSlug = generateSlug(name);
+  const isMenuItemExist = await isMenuItemSlugExist(menuItemSlug);
+
+  if (isMenuItemExist) {
+    throw new Error('Menu Item already exists');
+  }
+
+  const newMenuItem = await prisma.menuItem.create({
+    data: {
+      slug: menuItemSlug,
+      name,
+      price,
+      description,
+      images: {
+        createMany: {
+          data: images,
+        },
+      },
+      place: {
+        connect: {
+          slug: placeSlug,
+        },
+      },
+      user: {
+        connect: {
+          username,
+        },
+      },
+    },
+  });
+
+  return newMenuItem;
+};
+
+export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  return menuItem !== null;
 };
