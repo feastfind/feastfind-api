@@ -27,3 +27,11 @@ export const GetMenuItemReviewsBySlug = z.object({
   count: z.number(),
   menuItemReviews: MenuItemSchema.array(),
 });
+
+export const CreateMenuItemSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  description: z.string().nullable(),
+  images: z.array(z.object({ url: z.string() })),
+  placeSlug: z.string(),
+});

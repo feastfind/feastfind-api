@@ -1,7 +1,10 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { MenuItemSchema } from '../../../prisma/generated/zod';
 import { API_TAGS } from '../../config/config';
+import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
 import {
+  CreateMenuItemSchema,
   GetMenuItemReviewsBySlug,
   GetMenuItemReviewsBySlugRequestSchema,
   GetMenuItemsBySlugRequestSchema,
@@ -9,6 +12,7 @@ import {
   GetMenuItemsSchema,
 } from './schema';
 import {
+  createMenuItem,
   getMenuItemByParam,
   getMenuItemReviewsByMenuItemParam,
   getMenuItems,
@@ -155,6 +159,74 @@ menuItemsRoute.openapi(
       return handleErrorResponse(
         c,
         `Failed to retrieve menu item reviews: ${error} `,
+        500
+      );
+    }
+  }
+);
+
+menuItemsRoute.openapi(
+  {
+    method: 'post',
+    path: '/',
+    description: 'Add a new menu item.',
+    tags: API_TAGS.MENU_ITEM,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: CreateMenuItemSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Menu Item created successfully',
+        content: { 'application/json': { schema: MenuItemSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Place not found',
+      },
+      500: {
+        description: 'Failed to create place',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const user = c.get('user');
+
+      const { name, price, description, images, placeSlug } =
+        c.req.valid('json');
+
+      const username = user.username;
+
+      const menuItem = await createMenuItem(
+        name,
+        price,
+        description ?? '',
+        images,
+        username,
+        placeSlug
+      );
+
+      return c.json(
+        {
+          message: 'Menu Item created successfully',
+          menuItem,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(
+        c,
+        `Failed to create menu item: ${error} `,
         500
       );
     }
