@@ -5,11 +5,18 @@ import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
 import {
   CreatePlaceSchema,
+  DeletePlaceRequestSchema,
+  DeletePlaceResponseSchema,
   GetPlacesBySlugRequestSchema,
   GetPlacesBySlugSchema,
   GetPlacesSchema,
 } from './schema';
-import { createPlace, getPlaceByParam, getPlaces } from './service';
+import {
+  createPlace,
+  deletePlaceBySlug,
+  getPlaceByParam,
+  getPlaces,
+} from './service';
 
 const placesRoute = new OpenAPIHono();
 
@@ -169,6 +176,53 @@ placesRoute.openapi(
       );
     } catch (error) {
       return handleErrorResponse(c, `Failed to create place: ${error} `, 500);
+    }
+  }
+);
+
+placesRoute.openapi(
+  {
+    method: 'delete',
+    path: '/{slug}',
+    description: 'Delete a place.',
+    tags: API_TAGS.PLACE,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      params: DeletePlaceRequestSchema,
+    },
+    responses: {
+      200: {
+        description: 'Place deleted successfully',
+        content: { 'application/json': { schema: DeletePlaceResponseSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Place not found',
+      },
+      500: {
+        description: 'Failed to delete place',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const user = c.get('user');
+      const { slug } = c.req.valid('param');
+
+      const place = await deletePlaceBySlug(user.username, slug);
+
+      return c.json(
+        {
+          message: 'Place deleted successfully',
+          place,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(c, `Failed to delete place: ${error} `, 500);
     }
   }
 );

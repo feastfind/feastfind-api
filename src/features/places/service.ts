@@ -97,6 +97,32 @@ export const createPlace = async (
   return newPlace;
 };
 
+export const deletePlaceBySlug = async (
+  username: string,
+  slug: string
+): Promise<Partial<Place>> => {
+  const place = await prisma.place.findFirst({
+    where: {
+      OR: [{ slug }, { id: slug }],
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!place) {
+    throw new Error(
+      "Place not found or you don't have permission to delete it."
+    );
+  }
+
+  return await prisma.place.delete({
+    where: {
+      id: place.id,
+    },
+  });
+};
+
 export const isPlaceSlugExist = async (slug: string): Promise<boolean> => {
   const place = await prisma.place.findUnique({
     where: {
