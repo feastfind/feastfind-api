@@ -210,10 +210,10 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const user = c.get('user');
+      const { username } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const place = await deletePlaceBySlug(user.username, slug);
+      const place = await deletePlaceBySlug(username, slug);
 
       return c.json(
         {
