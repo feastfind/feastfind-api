@@ -6,6 +6,8 @@ import { handleErrorResponse } from '../../utils/handleError';
 import {
   CreateMenuItemReviewSchema,
   CreateMenuItemSchema,
+  DeleteMenuItemRequestParamSchema,
+  DeleteMenuItemResponseSchema,
   GetMenuItemReviewsBySlug,
   GetMenuItemReviewsBySlugRequestSchema,
   GetMenuItemsBySlugRequestSchema,
@@ -15,6 +17,7 @@ import {
 import {
   createMenuItem,
   createMenuItemReview,
+  deleteMenuItemBySlug,
   getMenuItemByParam,
   getMenuItemReviewsByMenuItemParam,
   getMenuItems,
@@ -295,6 +298,53 @@ menuItemsRoute.openapi(
         `Failed to create menu item review: ${error} `,
         500
       );
+    }
+  }
+);
+
+menuItemsRoute.openapi(
+  {
+    method: 'delete',
+    path: '/{slug}',
+    description: 'Delete a menu item.',
+    tags: API_TAGS.MENU_ITEM,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      params: DeleteMenuItemRequestParamSchema,
+    },
+    responses: {
+      200: {
+        description: 'Menu item deleted successfully',
+        content: { 'application/json': { schema: DeleteMenuItemResponseSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Menu item not found',
+      },
+      500: {
+        description: 'Failed to delete menu item',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const { username } = c.get('user');
+      const { slug } = c.req.valid('param');
+
+      const menuItem = await deleteMenuItemBySlug(username, slug);
+
+      return c.json(
+        {
+          message: 'Menu Item deleted successfully',
+          menuItem,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(c, `Failed to delete menu item: ${error} `, 500);
     }
   }
 );

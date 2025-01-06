@@ -41,3 +41,12 @@ export const CreateMenuItemReviewSchema = z.object({
   rating: z.number(),
   comment: z.string().nullable(),
 });
+
+export const DeleteMenuItemRequestParamSchema = z.object({
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
+})
+
+export const DeleteMenuItemResponseSchema = z.object({
+  message: z.string(),
+  menuItem: MenuItemSchema
+})

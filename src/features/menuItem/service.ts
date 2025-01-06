@@ -106,6 +106,32 @@ export const createMenuItemReview = async (
   })
 )
 
+export const deleteMenuItemBySlug = async (
+  username: string,
+  slug: string
+): Promise<Partial<MenuItem>> => {
+  const menuItem = await prisma.menuItem.findFirst({
+    where: {
+      OR: [{ slug }, { id: slug }],
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error(
+      "Menu item not found or you don't have permission to delete it."
+    );
+  }
+
+  return await prisma.menuItem.delete({
+    where: {
+      id: menuItem.id,
+    },
+  });
+};
+
 export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
   const menuItem = await prisma.menuItem.findUnique({
     where: {
