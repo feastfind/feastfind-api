@@ -5,11 +5,21 @@ import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
 import {
   CreatePlaceSchema,
+  DeletePlaceRequestSchema,
+  DeletePlaceResponseSchema,
   GetPlacesBySlugRequestSchema,
   GetPlacesBySlugSchema,
   GetPlacesSchema,
+  UpdatePlaceRequestBodySchema,
+  UpdatePlaceRequestParamSchema,
 } from './schema';
-import { createPlace, getPlaceByParam, getPlaces } from './service';
+import {
+  createPlace,
+  deletePlaceBySlug,
+  getPlaceByParam,
+  getPlaces,
+  updatePlace,
+} from './service';
 
 const placesRoute = new OpenAPIHono();
 
@@ -133,7 +143,7 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const user = c.get('user');
+      const { username } = c.get('user');
 
       const {
         name,
@@ -145,8 +155,6 @@ placesRoute.openapi(
         latitude,
         longitude,
       } = c.req.valid('json');
-
-      const username = user.username;
 
       const place = await createPlace(
         name,
@@ -169,6 +177,129 @@ placesRoute.openapi(
       );
     } catch (error) {
       return handleErrorResponse(c, `Failed to create place: ${error} `, 500);
+    }
+  }
+);
+
+placesRoute.openapi(
+  {
+    method: 'delete',
+    path: '/{slug}',
+    description: 'Delete a place.',
+    tags: API_TAGS.PLACE,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      params: DeletePlaceRequestSchema,
+    },
+    responses: {
+      200: {
+        description: 'Place deleted successfully',
+        content: { 'application/json': { schema: DeletePlaceResponseSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Place not found',
+      },
+      500: {
+        description: 'Failed to delete place',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const user = c.get('user');
+      const { slug } = c.req.valid('param');
+
+      const place = await deletePlaceBySlug(user.username, slug);
+
+      return c.json(
+        {
+          message: 'Place deleted successfully',
+          place,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(c, `Failed to delete place: ${error} `, 500);
+    }
+  }
+);
+
+placesRoute.openapi(
+  {
+    method: 'patch',
+    path: '/{slug}',
+    description: 'Update a place.',
+    tags: API_TAGS.PLACE,
+    security: [{ AuthorizationBearer: [] }],
+    middleware: authenticateUser,
+    request: {
+      params: UpdatePlaceRequestParamSchema,
+      body: {
+        content: {
+          'application/json': {
+            schema: UpdatePlaceRequestBodySchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Place updated successfully',
+        content: { 'application/json': { schema: PlaceSchema } },
+      },
+      400: {
+        description: 'Validation error',
+      },
+      404: {
+        description: 'Place not found',
+      },
+      500: {
+        description: 'Failed to update place',
+      },
+    },
+  },
+  async (c) => {
+    try {
+      const { username } = c.get('user');
+      const { slug } = c.req.valid('param');
+
+      const {
+        name,
+        description,
+        priceMin,
+        priceMax,
+        city,
+        address,
+        latitude,
+        longitude,
+      } = c.req.valid('json');
+
+      const place = await updatePlace(
+        slug,
+        username,
+        name,
+        description ?? '',
+        priceMin,
+        priceMax,
+        city,
+        address,
+        latitude,
+        longitude,
+      );
+
+      return c.json(
+        {
+          message: 'Place updated successfully',
+          place,
+        },
+        201
+      );
+    } catch (error) {
+      return handleErrorResponse(c, `Failed to update place: ${error} `, 500);
     }
   }
 );

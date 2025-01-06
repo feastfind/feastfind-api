@@ -28,3 +28,27 @@ export const CreatePlaceSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
 });
+
+export const DeletePlaceRequestSchema = z.object({
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
+});
+
+export const DeletePlaceResponseSchema = z.object({
+  message: z.string(),
+  place: PlaceSchema,
+});
+
+export const UpdatePlaceRequestParamSchema = z.object({
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
+});
+
+export const UpdatePlaceRequestBodySchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  priceMin: z.number().optional(),
+  priceMax: z.number().optional(),
+  city: z.string().optional(),
+  address: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+});
