@@ -2,6 +2,7 @@ import { Place } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 import { generateSlug } from '../../utils/slug';
 import { createCity, isCitySlugExist } from '../city/service';
+import { filterValidValues } from './utils';
 
 export const getPlaces = async (): Promise<{
   places: Place[];
@@ -45,6 +46,7 @@ export const createPlace = async (
   let newPlace;
 
   if (!isCityExist) {
+    // TODO: this will create a new city with place's latitude and longitude not city's
     const newCity = await createCity(citySlug, city, latitude, longitude);
 
     newPlace = await prisma.place.create({
@@ -120,6 +122,60 @@ export const deletePlaceBySlug = async (
     where: {
       id: place.id,
     },
+  });
+};
+
+export const updatePlace = async (
+  slug: string,
+  username: string,
+  name?: string,
+  description?: string,
+  priceMin?: number,
+  priceMax?: number,
+  city?: string,
+  address?: string,
+  latitude?: number,
+  longitude?: number
+): Promise<Partial<Place>> => {
+  const place = await prisma.place.findFirst({
+    where: {
+      OR: [{ slug }, { id: slug }],
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!place) {
+    throw new Error(
+      "Place not found or you don't have permission to update it."
+    );
+  }
+
+  const data = filterValidValues({
+    name,
+    description,
+    priceMin,
+    priceMax,
+    city,
+    address,
+    latitude,
+    longitude,
+  });
+
+  if (city) {
+    const citySlug = generateSlug(city);
+
+    data.city = {
+      connect: {
+        slug: citySlug,
+      },
+    };
+  }
+
+  return await prisma.place.update({
+    where: { id: place.id },
+    data,
   });
 };
 
