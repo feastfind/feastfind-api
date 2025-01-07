@@ -5,7 +5,7 @@ const PriceSchema = z.string().refine((val) => Number(val));
 
 export const GetPlacesSchema = z.object({
   count: z.number(),
-  place: PlaceSchema.extend({
+  places: PlaceSchema.extend({
     priceMin: PriceSchema,
     priceMax: PriceSchema,
   }).array(),
