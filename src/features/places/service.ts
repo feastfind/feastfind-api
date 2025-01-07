@@ -2,7 +2,7 @@ import { Place } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 import { generateSlug } from '../../utils/slug';
 import { createCity, isCitySlugExist } from '../city/service';
-import { filterValidValues } from './utils';
+import { filterValidValues } from '../../utils/filterValid';
 
 export const getPlaces = async (): Promise<{
   places: Place[];
