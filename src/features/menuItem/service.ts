@@ -1,5 +1,6 @@
 import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
+import { filterValidValues } from '../../utils/filterValid';
 import { generateSlug } from '../../utils/slug';
 import { isPlaceSlugExist } from '../places/service';
 
@@ -51,7 +52,7 @@ export const createMenuItem = async (
 ): Promise<Partial<MenuItem>> => {
   const isPlaceExist = await isPlaceSlugExist(placeSlug);
 
-  // TODO: depending on how the frontend works, we may want to change this 
+  // TODO: depending on how the frontend works, we may want to change this
   if (!isPlaceExist) {
     throw new Error('Place not found');
   }
@@ -95,7 +96,7 @@ export const createMenuItemReview = async (
   userId: string,
   rating: number,
   comment: string
-): Promise<Partial<MenuItemReview>> => (
+): Promise<Partial<MenuItemReview>> =>
   await prisma.menuItemReview.create({
     data: {
       menuItemId: menuItemId,
@@ -103,8 +104,7 @@ export const createMenuItemReview = async (
       rating,
       comment,
     },
-  })
-)
+  });
 
 export const deleteMenuItemBySlug = async (
   username: string,
@@ -129,6 +129,61 @@ export const deleteMenuItemBySlug = async (
     where: {
       id: menuItem.id,
     },
+  });
+};
+
+export const updateMenuItem = async (
+  slug: string,
+  username: string,
+  name?: string,
+  price?: number,
+  description?: string,
+  images?: { url: string }[],
+  placeSlug?: string
+): Promise<Partial<MenuItem>> => {
+  const menuItem = await prisma.menuItem.findFirst({
+    where: {
+      OR: [{ slug }, { id: slug }],
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error(
+      "Menu item not found or you don't have permission to update it."
+    );
+  }
+
+  const data = filterValidValues({
+    name,
+    price,
+    description,
+    placeSlug,
+  });
+
+  // TODO: updating images will require separate services, it also depends on how the frontend works
+  if (images) {
+    const imageUrls = images.map((image) => ({
+      url: image.url,
+    }));
+
+    await prisma.menuItem.update({
+      where: { id: menuItem.id },
+      data: {
+        images: {
+          createMany: {
+            data: imageUrls,
+          },
+        },
+      },
+    });
+  }
+
+  return await prisma.menuItem.update({
+    where: { id: menuItem.id },
+    data,
   });
 };
 

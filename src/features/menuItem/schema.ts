@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { MenuItemSchema } from '../../../prisma/generated/zod';
 
+export const MenuItemResponseSchema = z.object({
+  message: z.string(),
+  menuItem: MenuItemSchema,
+});
+
 export const GetMenuItemsSchema = z.object({
   count: z.number(),
   menuItems: MenuItemSchema.extend({
@@ -44,9 +49,16 @@ export const CreateMenuItemReviewSchema = z.object({
 
 export const DeleteMenuItemRequestParamSchema = z.object({
   slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
-})
+});
 
-export const DeleteMenuItemResponseSchema = z.object({
-  message: z.string(),
-  menuItem: MenuItemSchema
-})
+export const UpdateMenuItemRequestParamSchema = z.object({
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
+});
+
+export const UpdateMenuItemRequestBodySchema = z.object({
+  name: z.string().optional(),
+  price: z.number().optional(),
+  description: z.string().nullable().optional(),
+  images: z.array(z.object({ url: z.string() })).optional(),
+  placeSlug: z.string().optional(),
+});
