@@ -59,6 +59,8 @@ model Place {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([id, slug])
 }
 
 model MenuItem {
@@ -95,7 +97,7 @@ model MenuItemImage {
 }
 
 model MenuItemReview {
-  // id String @id @default(cuid())
+  id String @id @default(cuid())
 
   menuItemId String
   menuItem   MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
@@ -108,8 +110,6 @@ model MenuItemReview {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@id([menuItemId, userId])
 }
 
 model City {

@@ -19,6 +19,9 @@ export const getPlaceByParam = async (param: string): Promise<Place | null> => {
     where: {
       OR: [{ id: param }, { slug: param }],
     },
+    include: {
+      menuItems: true,
+    },
   });
 };
 
