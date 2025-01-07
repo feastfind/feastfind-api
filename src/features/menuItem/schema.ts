@@ -1,9 +1,21 @@
 import { z } from 'zod';
-import { MenuItemSchema } from '../../../prisma/generated/zod';
+import {
+  MenuItemReviewSchema,
+  MenuItemSchema,
+} from '../../../prisma/generated/zod';
 
 export const MenuItemResponseSchema = z.object({
   message: z.string(),
   menuItem: MenuItemSchema,
+});
+
+export const MenuItemReviewResponseSchema = z.object({
+  message: z.string(),
+  menuItemReview: MenuItemReviewSchema,
+});
+
+export const MenuItemRequestParamSchema = z.object({
+  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
 });
 
 export const GetMenuItemsSchema = z.object({
@@ -13,19 +25,8 @@ export const GetMenuItemsSchema = z.object({
   }).array(),
 });
 
-export const GetMenuItemsBySlugRequestSchema = z.object({
-  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
-});
-
 export const GetMenuItemsBySlugSchema = MenuItemSchema.extend({
   price: z.string().refine((val) => Number(val)),
-});
-
-export const GetMenuItemReviewsBySlugRequestSchema = z.object({
-  slug: z
-    .string()
-    .max(255)
-    .openapi({ description: 'param: menu slug | menu id' }),
 });
 
 export const GetMenuItemReviewsBySlug = z.object({
@@ -45,14 +46,6 @@ export const CreateMenuItemReviewSchema = z.object({
   menuItemId: z.string(),
   rating: z.number(),
   comment: z.string().nullable(),
-});
-
-export const DeleteMenuItemRequestParamSchema = z.object({
-  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
-});
-
-export const UpdateMenuItemRequestParamSchema = z.object({
-  slug: z.string().max(255).openapi({ description: 'param: slug | id' }),
 });
 
 export const UpdateMenuItemRequestBodySchema = z.object({
