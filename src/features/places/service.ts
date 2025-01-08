@@ -8,7 +8,10 @@ export const getPlaces = async (): Promise<{
   places: Place[];
   count: number;
 }> => {
-  const places = await prisma.place.findMany();
+  const places = await prisma.place.findMany({
+    include: { menuItems: { select: { images: true } } },
+  });
+
   const count = await prisma.place.count();
 
   return { places, count };
@@ -18,6 +21,9 @@ export const getPlaceByParam = async (param: string): Promise<Place | null> => {
   return await prisma.place.findFirst({
     where: {
       OR: [{ id: param }, { slug: param }],
+    },
+    include: {
+      menuItems: { select: { images: true } },
     },
   });
 };

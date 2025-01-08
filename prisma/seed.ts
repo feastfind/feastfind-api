@@ -118,6 +118,8 @@ async function seedMenuItems() {
 }
 
 async function seedMenuItemsReview() {
+  await prisma.menuItemReview.deleteMany();
+
   for (const menuItemReview of dataMenuItemsReview) {
     const { menuItemSlug, username, ...menuItemReviewData } = menuItemReview;
 
@@ -139,15 +141,8 @@ async function seedMenuItemsReview() {
       user: { connect: { id: user.id } },
     };
 
-    await prisma.menuItemReview.upsert({
-      where: {
-        menuItemId_userId: {
-          menuItemId: menuItem.id,
-          userId: user.id,
-        },
-      },
-      update: menuItemReviewUpsertData,
-      create: menuItemReviewUpsertData,
+    await prisma.menuItemReview.create({
+      data: menuItemReviewUpsertData,
     });
   }
 
