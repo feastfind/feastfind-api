@@ -187,6 +187,68 @@ export const updateMenuItem = async (
   });
 };
 
+export const deleteMenuItemReviewBySlug = async (
+  username: string,
+  slug: string
+): Promise<Partial<MenuItem>> => {
+  const menuItemReview = await prisma.menuItemReview.findFirst({
+    where: {
+      menuItem: {
+        slug,
+      },
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!menuItemReview) {
+    throw new Error(
+      "Menu item review not found or you don't have permission to delete it."
+    );
+  }
+
+  return await prisma.menuItemReview.delete({
+    where: {
+      id: menuItemReview.id,
+    },
+  });
+};
+
+export const updateMenuItemReview = async (
+  slug: string,
+  username: string,
+  rating?: number,
+  comment?: string
+): Promise<Partial<MenuItemReview>> => {
+  const menuItemReview = await prisma.menuItemReview.findFirst({
+    where: {
+      menuItem: {
+        slug,
+      },
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!menuItemReview) {
+    throw new Error(
+      "Menu item review not found or you don't have permission to update it."
+    );
+  }
+
+  return await prisma.menuItemReview.update({
+    where: {
+      id: menuItemReview.id,
+    },
+    data: {
+      rating,
+      comment,
+    },
+  });
+};
+
 export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
   const menuItem = await prisma.menuItem.findUnique({
     where: {
