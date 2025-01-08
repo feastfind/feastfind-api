@@ -210,10 +210,41 @@ export const deleteMenuItemReviewBySlug = async (
 
   return await prisma.menuItemReview.delete({
     where: {
-      menuItemId_userId: {
-        menuItemId: menuItemReview.menuItemId,
-        userId: menuItemReview.userId,
+      id: menuItemReview.id,
+    },
+  });
+};
+
+export const updateMenuItemReview = async (
+  slug: string,
+  username: string,
+  rating?: number,
+  comment?: string
+): Promise<Partial<MenuItemReview>> => {
+  const menuItemReview = await prisma.menuItemReview.findFirst({
+    where: {
+      menuItem: {
+        slug,
       },
+      user: {
+        username,
+      },
+    },
+  });
+
+  if (!menuItemReview) {
+    throw new Error(
+      "Menu item review not found or you don't have permission to update it."
+    );
+  }
+
+  return await prisma.menuItemReview.update({
+    where: {
+      id: menuItemReview.id,
+    },
+    data: {
+      rating,
+      comment,
     },
   });
 };

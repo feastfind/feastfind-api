@@ -55,3 +55,8 @@ export const UpdateMenuItemRequestBodySchema = z.object({
   images: z.array(z.object({ url: z.string() })).optional(),
   placeSlug: z.string().optional(),
 });
+
+export const UpdateMenuItemReviewRequestBodySchema = z.object({
+  rating: z.number().optional(),
+  comment: z.string().nullable().optional(),
+});
