@@ -2,6 +2,16 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@user/*": ["src/features/user/*"],
+      "@place/*": ["src/features/place/*"],
+      "@city/*": ["src/features/city/*"],
+      "@menuItem/*": ["src/features/menuItem/*"],
+      "@auth/*": ["src/features/auth/*"],
+      "@prisma/*": ["prisma/*"],
+    }
   }
 }
