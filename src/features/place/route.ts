@@ -31,15 +31,9 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const { places, count } = await placeService.getPlaces();
+      const places = await placeService.getPlaces();
 
-      return c.json(
-        {
-          count,
-          places,
-        },
-        200
-      );
+      return c.json(places, 200);
     } catch (error) {
       return handleErrorResponse(
         c,

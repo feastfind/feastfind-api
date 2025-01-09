@@ -95,7 +95,7 @@ updated_at: jsonpath "$.place.updatedAt"
 # Get all places
 GET http://localhost:3000/places
 HTTP 200
-{"count":1,"places":[{"id":"{{place_id}}","slug":"{{place_slug}}","name":"test","description":"testing","priceMin":"50000","priceMax":"1000000","cityId":"{{city_id}}","address":"jalan margonda rawan begal","latitude":0.934,"longitude":1,"userId":"{{user_id}}","createdAt":"{{created_at}}","updatedAt":"{{updated_at}}","images":[]}]}
+[{"id":"{{place_id}}","slug":"{{place_slug}}","name":"test","description":"testing","priceMin":"50000","priceMax":"1000000","cityId":"{{city_id}}","address":"jalan margonda rawan begal","latitude":0.934,"longitude":1,"userId":"{{user_id}}","createdAt":"{{created_at}}","updatedAt":"{{updated_at}}","images":[]}]
 
 # Get a place by id
 GET http://localhost:3000/places/{{place_id}}

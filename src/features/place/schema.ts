@@ -21,10 +21,7 @@ export const PlaceResponse = z.object({
   place: Place,
 });
 
-export const GetPlaces = z.object({
-  count: z.number(),
-  places: PlaceWithImages.array(),
-});
+export const GetPlaces = PlaceWithImages.array();
 
 export const GetPlaceDetail = PlaceSchema.extend({
   menuItems: MenuItemSchema.extend({
