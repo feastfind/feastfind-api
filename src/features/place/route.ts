@@ -1,25 +1,10 @@
+import { API_TAGS } from '@/config/config';
+import { authenticateUser } from '@/middlewares/authenticateUser';
+import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { PlaceSchema } from '../../../prisma/generated/zod';
-import { API_TAGS } from '../../config/config';
-import { authenticateUser } from '../../middlewares/authenticateUser';
-import { handleErrorResponse } from '../../utils/handleError';
-import {
-  CreatePlaceSchema,
-  DeletePlaceRequestSchema,
-  DeletePlaceResponseSchema,
-  GetPlacesBySlugRequestSchema,
-  GetPlacesBySlugSchema,
-  GetPlacesSchema,
-  UpdatePlaceRequestBodySchema,
-  UpdatePlaceRequestParamSchema,
-} from './schema';
-import {
-  createPlace,
-  deletePlaceBySlug,
-  getPlaceByParam,
-  getPlaces,
-  updatePlace,
-} from './service';
+
+import * as placeSchema from '@place/schema';
+import * as placeService from '@place/service';
 
 const placesRoute = new OpenAPIHono();
 
@@ -27,6 +12,7 @@ placesRoute.openapi(
   {
     method: 'get',
     path: '/',
+    summary: 'Get all places',
     description: 'Get a list of places.',
     tags: API_TAGS.PLACE,
     responses: {
@@ -34,18 +20,18 @@ placesRoute.openapi(
         description: 'Places retrieved successfully',
         content: {
           'application/json': {
-            schema: GetPlacesSchema,
+            schema: placeSchema.GetPlaces,
           },
         },
       },
       500: {
-        description: 'Failed to retrieve cities',
+        description: 'Failed to retrieve places',
       },
     },
   },
   async (c) => {
     try {
-      const { places, count } = await getPlaces();
+      const { places, count } = await placeService.getPlaces();
 
       return c.json(
         {
@@ -57,7 +43,7 @@ placesRoute.openapi(
     } catch (error) {
       return handleErrorResponse(
         c,
-        `Failed to retrieve cities: ${error} `,
+        `Failed to retrieve places: ${error} `,
         500
       );
     }
@@ -68,22 +54,20 @@ placesRoute.openapi(
   {
     method: 'get',
     path: '/{slug}',
-    description: 'Get a place by slug.',
+    summary: 'Get place details',
+    description: 'Get place details by slug or id.',
     tags: API_TAGS.PLACE,
     request: {
-      params: GetPlacesBySlugRequestSchema,
+      params: placeSchema.PlacesParam,
     },
     responses: {
       200: {
         description: 'Place retrieved successfully',
         content: {
           'application/json': {
-            schema: GetPlacesBySlugSchema,
+            schema: placeSchema.GetPlaceDetail,
           },
         },
-      },
-      400: {
-        description: 'Invalid place slug',
       },
       404: {
         description: 'Place not found',
@@ -97,7 +81,7 @@ placesRoute.openapi(
     try {
       const { slug } = c.req.valid('param');
 
-      const place = await getPlaceByParam(slug);
+      const place = await placeService.getPlaceByParam(slug);
 
       if (!place) return handleErrorResponse(c, 'Place not found', 404);
 
@@ -112,6 +96,7 @@ placesRoute.openapi(
   {
     method: 'post',
     path: '/',
+    summary: 'Create a place',
     description: 'Add a new place.',
     tags: API_TAGS.PLACE,
     security: [{ AuthorizationBearer: [] }],
@@ -120,7 +105,7 @@ placesRoute.openapi(
       body: {
         content: {
           'application/json': {
-            schema: CreatePlaceSchema,
+            schema: placeSchema.CreatePlace,
           },
         },
       },
@@ -128,13 +113,13 @@ placesRoute.openapi(
     responses: {
       201: {
         description: 'Place created successfully',
-        content: { 'application/json': { schema: PlaceSchema } },
+        content: { 'application/json': { schema: placeSchema.PlaceResponse } },
       },
       400: {
         description: 'Validation error',
       },
-      404: {
-        description: 'Place not found',
+      403: {
+        description: 'Forbidden',
       },
       500: {
         description: 'Failed to create place',
@@ -156,7 +141,7 @@ placesRoute.openapi(
         longitude,
       } = c.req.valid('json');
 
-      const place = await createPlace(
+      const place = await placeService.createPlace(
         name,
         description ?? '',
         priceMin,
@@ -185,20 +170,27 @@ placesRoute.openapi(
   {
     method: 'delete',
     path: '/{slug}',
-    description: 'Delete a place.',
+    summary: 'Delete a place',
+    description: 'Delete a place by slug or id.',
     tags: API_TAGS.PLACE,
     security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     request: {
-      params: DeletePlaceRequestSchema,
+      params: placeSchema.PlacesParam,
     },
     responses: {
       200: {
         description: 'Place deleted successfully',
-        content: { 'application/json': { schema: DeletePlaceResponseSchema } },
+        content: { 'application/json': { schema: placeSchema.PlaceResponse } },
       },
       400: {
         description: 'Validation error',
+      },
+      401: {
+        description: 'Unauthorized',
+      },
+      403: {
+        description: 'Forbidden',
       },
       404: {
         description: 'Place not found',
@@ -213,14 +205,14 @@ placesRoute.openapi(
       const { username } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const place = await deletePlaceBySlug(username, slug);
+      const place = await placeService.deletePlaceBySlug(username, slug);
 
       return c.json(
         {
           message: 'Place deleted successfully',
           place,
         },
-        201
+        200
       );
     } catch (error) {
       return handleErrorResponse(c, `Failed to delete place: ${error} `, 500);
@@ -232,16 +224,17 @@ placesRoute.openapi(
   {
     method: 'patch',
     path: '/{slug}',
-    description: 'Update a place.',
+    summary: 'Update a place',
+    description: 'Update a place by slug or id.',
     tags: API_TAGS.PLACE,
     security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     request: {
-      params: UpdatePlaceRequestParamSchema,
+      params: placeSchema.PlacesParam,
       body: {
         content: {
           'application/json': {
-            schema: UpdatePlaceRequestBodySchema,
+            schema: placeSchema.UpdatePlace,
           },
         },
       },
@@ -249,10 +242,16 @@ placesRoute.openapi(
     responses: {
       201: {
         description: 'Place updated successfully',
-        content: { 'application/json': { schema: PlaceSchema } },
+        content: { 'application/json': { schema: placeSchema.PlaceResponse } },
       },
       400: {
         description: 'Validation error',
+      },
+      401: {
+        description: 'Unauthorized',
+      },
+      403: {
+        description: 'Forbidden',
       },
       404: {
         description: 'Place not found',
@@ -278,7 +277,7 @@ placesRoute.openapi(
         longitude,
       } = c.req.valid('json');
 
-      const place = await updatePlace(
+      const place = await placeService.updatePlace(
         slug,
         username,
         name,
@@ -288,7 +287,7 @@ placesRoute.openapi(
         city,
         address,
         latitude,
-        longitude,
+        longitude
       );
 
       return c.json(
@@ -296,7 +295,7 @@ placesRoute.openapi(
           message: 'Place updated successfully',
           place,
         },
-        201
+        200
       );
     } catch (error) {
       return handleErrorResponse(c, `Failed to update place: ${error} `, 500);
