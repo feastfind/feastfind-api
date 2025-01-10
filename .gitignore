@@ -5,3 +5,4 @@ node_modules/
 .vscode
 prisma/generated
 TODO.md
+tests/test.hurl
