@@ -1,16 +1,21 @@
 import { City } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
-import { isValidCUID } from '../../utils/regex';
 
-export const getCities = async (): Promise<City[]> => {
-  return await prisma.city.findMany();
+export const getCities = async (): Promise<{
+  cities: City[];
+  count: number;
+}> => {
+  const cities = await prisma.city.findMany();
+  const count = await prisma.city.count();
+
+  return { cities, count };
 };
 
 export const getCityByParam = async (param: string): Promise<City | null> => {
-  const isCUID = isValidCUID(param);
-
-  return await prisma.city.findUnique({
-    where: isCUID ? { id: param } : { slug: param },
+  return await prisma.city.findFirst({
+    where: {
+      OR: [{ slug: param }, { id: param }],
+    },
   });
 };
 

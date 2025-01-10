@@ -1,9 +1,14 @@
-import { OpenAPIHono, z } from '@hono/zod-openapi';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import { PlaceSchema } from '../../../prisma/generated/zod';
 import { API_TAGS } from '../../config/config';
 import { authenticateUser } from '../../middlewares/authenticateUser';
 import { handleErrorResponse } from '../../utils/handleError';
-import { CreatePlaceSchema } from './schema';
+import {
+  CreatePlaceSchema,
+  GetPlacesBySlugRequestSchema,
+  GetPlacesBySlugSchema,
+  GetPlacesSchema,
+} from './schema';
 import { createPlace, getPlaceByParam, getPlaces } from './service';
 
 const placesRoute = new OpenAPIHono();
@@ -19,10 +24,7 @@ placesRoute.openapi(
         description: 'Places retrieved successfully',
         content: {
           'application/json': {
-            schema: PlaceSchema.extend({
-              priceMin: z.string().refine((val) => Number(val)),
-              priceMax: z.string().refine((val) => Number(val)),
-            }).array(),
+            schema: GetPlacesSchema,
           },
         },
       },
@@ -33,9 +35,15 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const places = await getPlaces();
+      const { places, count } = await getPlaces();
 
-      return c.json(places, 200);
+      return c.json(
+        {
+          count,
+          places,
+        },
+        200
+      );
     } catch (error) {
       return handleErrorResponse(
         c,
@@ -49,23 +57,18 @@ placesRoute.openapi(
 placesRoute.openapi(
   {
     method: 'get',
-    path: '/{param}',
-    description: 'Get a place by param.',
+    path: '/{slug}',
+    description: 'Get a place by slug.',
     tags: API_TAGS.PLACE,
     request: {
-      params: z.object({
-        param: z.string().max(255).openapi({ description: 'param: slug | id' }),
-      }),
+      params: GetPlacesBySlugRequestSchema,
     },
     responses: {
       200: {
         description: 'Place retrieved successfully',
         content: {
           'application/json': {
-            schema: PlaceSchema.extend({
-              priceMin: z.string().refine((val) => Number(val)),
-              priceMax: z.string().refine((val) => Number(val)),
-            }),
+            schema: GetPlacesBySlugSchema,
           },
         },
       },
@@ -82,9 +85,9 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const { param } = c.req.valid('param');
+      const { slug } = c.req.valid('param');
 
-      const place = await getPlaceByParam(param);
+      const place = await getPlaceByParam(slug);
 
       if (!place) return handleErrorResponse(c, 'Place not found', 404);
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { UserSchema } from '../../../prisma/generated/zod';
 
-export const RegisterUserSchema = z.object({
+export const RegisterUserRequestSchema = z.object({
   name: z.string(),
   username: z.string(),
   email: z.string(),
@@ -8,10 +9,14 @@ export const RegisterUserSchema = z.object({
   password: z.string(),
 });
 
-export const LoginUserSchema = z.object({
+export const RegisterUserSchema = UserSchema;
+
+export const LoginUserRequestSchema = z.object({
   identifier: z
     .string()
     .max(255)
     .openapi({ description: 'identifier: email | username' }),
   password: z.string().min(1).max(255),
 });
+
+export const LoginUserSchema = UserSchema;
