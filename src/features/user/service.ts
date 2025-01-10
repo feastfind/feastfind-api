@@ -1,14 +1,8 @@
-import { User } from '../../../prisma/generated/zod';
-import prisma from '../../lib/db';
+import prisma from '@/lib/db';
+import { User } from '@prisma/generated/zod';
 
-export const getAllUsers = async (): Promise<{
-  users: User[];
-  count: number;
-}> => {
-  const users = await prisma.user.findMany();
-  const count = await prisma.user.count();
-
-  return { users, count };
+export const getAllUsers = async (): Promise<User[]> => {
+  return await prisma.user.findMany();
 };
 
 export const getUserByParam = async (param: string): Promise<User | null> => {
