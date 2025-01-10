@@ -1,4 +1,6 @@
 {
+  "include": ["src", "prisma", "tests"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
@@ -11,7 +13,7 @@
       "@city/*": ["src/features/city/*"],
       "@menuItem/*": ["src/features/menuItem/*"],
       "@auth/*": ["src/features/auth/*"],
-      "@prisma/*": ["prisma/*"],
+      "@prisma/*": ["prisma/*"]
     }
   }
 }
