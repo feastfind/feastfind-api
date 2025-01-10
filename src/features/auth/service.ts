@@ -1,15 +1,15 @@
-import { User } from '../../../prisma/generated/zod';
-import prisma from '../../lib/db';
-import { hashPassword, verifyPassword } from '../../utils/password';
-import { createToken } from '../../utils/token';
+import prisma from '@/lib/db';
+import { hashPassword, verifyPassword } from '@/utils/password';
+import { createToken } from '@/utils/token';
+import type { LoginUser, RegisterUser, User } from './schema';
+import { getDiceBearAvatar, isValidEmail } from './utils';
 
-export const registerUser = async (
-  name: string,
-  username: string,
-  email: string,
-  avatarURL: string,
-  password: string
-): Promise<Partial<User>> => {
+export const registerUser = async ({
+  name,
+  username,
+  email,
+  password,
+}: RegisterUser): Promise<Partial<User>> => {
   const existingUsername = await prisma.user.findUnique({
     where: {
       username,
@@ -31,6 +31,7 @@ export const registerUser = async (
   }
 
   const hashedPassword = await hashPassword(password);
+  const avatarURL = getDiceBearAvatar(username, 64);
 
   const newUser = await prisma.user.create({
     data: {
@@ -55,11 +56,11 @@ export const registerUser = async (
   };
 };
 
-export const loginUser = async (
-  identifier: string,
-  password: string,
-): Promise<{ token: string | null; user: Partial<User> }> => {
-  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+export const loginUser = async ({
+  identifier,
+  password,
+}: LoginUser): Promise<{ token: string | null; user: Partial<User> }> => {
+  const isEmail = isValidEmail(identifier);
 
   const user = await prisma.user.findUnique({
     where: isEmail ? { email: identifier } : { username: identifier },
