@@ -1,12 +1,9 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { API_TAGS } from '../../config/config';
 import { handleErrorResponse } from '../../utils/handleError';
-import {
-  GetUserByUsernameRequestSchema,
-  GetUserByUsernameSchema,
-  GetUsersSchema,
-} from './schema';
-import { getAllUsers, getUserByParam } from './service';
+
+import * as userSchema from '@user/schema';
+import * as userService from '@user/service';
 
 const usersRoute = new OpenAPIHono();
 
@@ -14,27 +11,22 @@ usersRoute.openapi(
   {
     method: 'get',
     path: '/',
+    summary: 'Get all users',
     description: 'Get all users without pagination',
     tags: API_TAGS.USER,
     responses: {
       200: {
         description: 'Get all users',
-        content: { 'application/json': { schema: GetUsersSchema } },
+        content: { 'application/json': { schema: userSchema.GetUsers } },
       },
       500: { description: 'Failed to get all users' },
     },
   },
   async (c) => {
     try {
-      const { users, count } = await getAllUsers();
+      const users = await userService.getAllUsers();
 
-      return c.json(
-        {
-          count,
-          users,
-        },
-        200
-      );
+      return c.json(users, 200);
     } catch (error) {
       return handleErrorResponse(c, `Failed to get all users: ${error}`, 500);
     }
@@ -45,17 +37,17 @@ usersRoute.openapi(
   {
     method: 'get',
     path: '/{username}',
-    description: 'Get a user by username.',
+    summary: 'Get user details',
+    description: 'Get a user by username, email, or id.',
     tags: API_TAGS.USER,
     request: {
-      params: GetUserByUsernameRequestSchema,
+      params: userSchema.UserParam,
     },
     responses: {
       200: {
         description: 'User retrieved successfully',
-        content: { 'application/json': { schema: GetUserByUsernameSchema } },
+        content: { 'application/json': { schema: userSchema.GetUserDetail } },
       },
-      400: { description: 'Invalid param' },
       404: { description: 'User not found' },
       500: { description: 'Failed to get user' },
     },
@@ -64,7 +56,7 @@ usersRoute.openapi(
     try {
       const { username } = c.req.valid('param');
 
-      const user = await getUserByParam(username);
+      const user = await userService.getUserByParam(username);
 
       if (!user) return handleErrorResponse(c, 'User not found', 404);
 

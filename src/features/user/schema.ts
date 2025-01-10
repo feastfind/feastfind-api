@@ -1,16 +1,13 @@
+import { UserSchema } from '@prisma/generated/zod';
 import { z } from 'zod';
-import { UserSchema } from '../../../prisma/generated/zod';
 
-export const GetUsersSchema = z.object({
-  count: z.number(),
-  users: UserSchema.array(),
-});
-
-export const GetUserByUsernameRequestSchema = z.object({
+export const UserParam = z.object({
   username: z
     .string()
     .max(255)
     .openapi({ description: 'param: username | id | email' }),
 });
 
-export const GetUserByUsernameSchema = UserSchema;
+export const GetUsers = UserSchema.array()
+
+export const GetUserDetail = UserSchema;
