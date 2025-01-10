@@ -1,15 +1,10 @@
+import { API_TAGS } from '@/config/config';
+import { authenticateUser } from '@/middlewares/authenticateUser';
+import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { API_TAGS } from '../../config/config';
-import { authenticateUser } from '../../middlewares/authenticateUser';
-import { handleErrorResponse } from '../../utils/handleError';
-import {
-  LoginUserRequestSchema,
-  LoginUserSchema,
-  RegisterUserRequestSchema,
-  RegisterUserSchema,
-} from './schema';
-import { loginUser, registerUser } from './service';
-import { getDiceBearAvatar } from './utils';
+
+import * as authSchema from '@auth/schema';
+import * as authService from '@auth/service';
 
 const authRoute = new OpenAPIHono();
 
@@ -17,13 +12,14 @@ authRoute.openapi(
   {
     method: 'post',
     path: '/register',
-    description: 'Register user.',
+    summary: 'Register user',
+    description: 'Register a new user.',
     tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
           'application/json': {
-            schema: RegisterUserRequestSchema,
+            schema: authSchema.RegisterUser,
           },
         },
       },
@@ -31,7 +27,7 @@ authRoute.openapi(
     responses: {
       201: {
         description: 'User registered successfully',
-        content: { 'application/json': { schema: RegisterUserSchema } },
+        content: { 'application/json': { schema: authSchema.UserResponse } },
       },
       400: {
         description: 'Validation error',
@@ -43,16 +39,7 @@ authRoute.openapi(
   },
   async (c) => {
     try {
-      const { name, username, email, avatarURL, password } =
-        c.req.valid('json');
-
-      const user = await registerUser(
-        name,
-        username,
-        email,
-        avatarURL ?? getDiceBearAvatar(username, 64),
-        password
-      );
+      const user = await authService.registerUser(c.req.valid('json'));
 
       return c.json(
         {
@@ -71,13 +58,14 @@ authRoute.openapi(
   {
     method: 'post',
     path: '/login',
-    description: 'Login user.',
+    summary: 'Login user',
+    description: 'Login user by email or username.',
     tags: API_TAGS.AUTH,
     request: {
       body: {
         content: {
           'application/json': {
-            schema: LoginUserRequestSchema,
+            schema: authSchema.LoginUser,
           },
         },
       },
@@ -85,7 +73,9 @@ authRoute.openapi(
     responses: {
       200: {
         description: 'User logged in successfully',
-        content: { 'application/json': { schema: LoginUserSchema } },
+        content: {
+          'application/json': { schema: authSchema.LoginUserResponse },
+        },
       },
       400: {
         description: 'Validation error',
@@ -100,9 +90,7 @@ authRoute.openapi(
   },
   async (c) => {
     try {
-      const { identifier, password } = c.req.valid('json');
-
-      const { token, user } = await loginUser(identifier, password);
+      const { token, user } = await authService.loginUser(c.req.valid('json'));
 
       if (!token) {
         return handleErrorResponse(c, 'Invalid email or password', 401);
@@ -111,8 +99,8 @@ authRoute.openapi(
       return c.json(
         {
           message: 'User logged in successfully',
-          token,
           user,
+          token,
         },
         200
       );
@@ -126,6 +114,7 @@ authRoute.openapi(
   {
     method: 'get',
     path: '/me',
+    summary: 'Get authenticated user',
     description: 'Get authenticated user information.',
     tags: API_TAGS.AUTH,
     security: [{ AuthorizationBearer: [] }],
@@ -133,10 +122,12 @@ authRoute.openapi(
     responses: {
       200: {
         description: 'User information retrieved successfully',
+        content: {
+          'application/json': { schema: authSchema.UserResponse },
+        },
       },
       401: {
-        description:
-          'Authorization header not found | Token not found | Invalid token | User not found',
+        description: 'Invalid token',
       },
       500: {
         description: 'Failed to retrieve user information',

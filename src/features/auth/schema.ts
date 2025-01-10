@@ -1,22 +1,31 @@
+import { UserSchema } from '@prisma/generated/zod';
 import { z } from 'zod';
-import { UserSchema } from '../../../prisma/generated/zod';
 
-export const RegisterUserRequestSchema = z.object({
+export const User = UserSchema;
+export type User = z.infer<typeof User>;
+
+export const UserResponse = z.object({
+  message: z.string(),
+  user: User,
+});
+
+export const RegisterUser = z.object({
   name: z.string(),
   username: z.string(),
   email: z.string(),
-  avatarURL: z.string().optional().nullable(),
   password: z.string(),
 });
+export type RegisterUser = z.infer<typeof RegisterUser>;
 
-export const RegisterUserSchema = UserSchema;
-
-export const LoginUserRequestSchema = z.object({
+export const LoginUser = z.object({
   identifier: z
     .string()
     .max(255)
     .openapi({ description: 'identifier: email | username' }),
   password: z.string().min(1).max(255),
 });
+export type LoginUser = z.infer<typeof LoginUser>;
 
-export const LoginUserSchema = UserSchema;
+export const LoginUserResponse = UserResponse.extend({
+  token: z.string(),
+});
