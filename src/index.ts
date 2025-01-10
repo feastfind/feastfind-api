@@ -3,11 +3,11 @@ import { apiReference } from '@scalar/hono-api-reference';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
-import { authRoute } from './features/auth/route';
-import { citiesRoute } from './features/city/route';
-import { placesRoute } from './features/places/route';
-import { usersRoute } from './features/user/route';
-import { menuItemsRoute } from './features/menuItem/route';
+import { authRoute } from '@auth/route';
+import { citiesRoute } from '@city/route';
+import { placesRoute } from '@place/route';
+import { usersRoute } from '@user/route';
+import { menuItemsRoute } from '@menuItem/route';
 
 const app = new OpenAPIHono();
 
@@ -22,7 +22,7 @@ app.get(
   '/',
   apiReference({
     pageTitle: 'FeastFind API',
-    theme: 'elysiajs',
+    theme: 'default',
     spec: {
       url: '/openapi.json',
     },

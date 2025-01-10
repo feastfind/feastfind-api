@@ -10,7 +10,7 @@
     "generate": "prisma generate",
     "seed": "prisma db seed",
     "studio": "prisma studio",
-    "reset": "prisma migrate reset --force"
+    "reset": "prisma migrate reset --force --skip-seed"
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
