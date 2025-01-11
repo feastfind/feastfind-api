@@ -12,6 +12,7 @@
       "@place/*": ["src/features/place/*"],
       "@city/*": ["src/features/city/*"],
       "@menuItem/*": ["src/features/menuItem/*"],
+      "@menuReview/*": ["src/features/menuReview/*"],
       "@auth/*": ["src/features/auth/*"],
       "@prisma/*": ["prisma/*"]
     }
