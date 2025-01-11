@@ -1,18 +1,11 @@
-import { Context } from 'hono';
-import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
-import prisma from '../../lib/db';
-import { filterValidValues } from '../../utils/filterValid';
-import { generateSlug } from '../../utils/slug';
-import { isPlaceSlugExist } from '../places/service';
+import prisma from '@/lib/db';
+import { filterValidValues } from '@/utils/filterValid';
+import { generateSlug } from '@/utils/slug';
+import { isPlaceSlugExist } from '@place/service';
+import { MenuItem } from '@prisma/generated/zod';
 
-export const getMenuItems = async (): Promise<{
-  menuItems: MenuItem[];
-  count: number;
-}> => {
-  const menuItems = await prisma.menuItem.findMany();
-  const count = await prisma.menuItem.count();
-
-  return { menuItems, count };
+export const getMenuItems = async (): Promise<MenuItem[]> => {
+  return await prisma.menuItem.findMany();
 };
 
 export const getMenuItemByParam = async (
@@ -23,24 +16,6 @@ export const getMenuItemByParam = async (
       OR: [{ id: param }, { slug: param }],
     },
   });
-};
-
-export const getMenuItemReviewsByMenuItemParam = async (
-  menuItemId: string
-): Promise<{ menuItemReviews: MenuItemReview[]; count: number }> => {
-  const menuItemReviews = await prisma.menuItemReview.findMany({
-    where: {
-      menuItemId,
-    },
-  });
-
-  const count = await prisma.menuItemReview.count({
-    where: {
-      menuItemId,
-    },
-  });
-
-  return { menuItemReviews, count };
 };
 
 export const createMenuItem = async (
@@ -91,21 +66,6 @@ export const createMenuItem = async (
 
   return newMenuItem;
 };
-
-export const createMenuItemReview = async (
-  menuItemId: string,
-  userId: string,
-  rating: number,
-  comment: string
-): Promise<Partial<MenuItemReview>> =>
-  await prisma.menuItemReview.create({
-    data: {
-      menuItemId: menuItemId,
-      userId: userId,
-      rating,
-      comment,
-    },
-  });
 
 export const deleteMenuItemBySlug = async (
   username: string,
@@ -185,68 +145,6 @@ export const updateMenuItem = async (
   return await prisma.menuItem.update({
     where: { id: menuItem.id },
     data,
-  });
-};
-
-export const deleteMenuItemReviewBySlug = async (
-  username: string,
-  slug: string
-): Promise<Partial<MenuItem>> => {
-  const menuItemReview = await prisma.menuItemReview.findFirst({
-    where: {
-      menuItem: {
-        slug,
-      },
-      user: {
-        username,
-      },
-    },
-  });
-
-  if (!menuItemReview) {
-    throw new Error(
-      "Menu item review not found or you don't have permission to delete it."
-    );
-  }
-
-  return await prisma.menuItemReview.delete({
-    where: {
-      id: menuItemReview.id,
-    },
-  });
-};
-
-export const updateMenuItemReview = async (
-  slug: string,
-  username: string,
-  rating?: number,
-  comment?: string
-): Promise<Partial<MenuItemReview>> => {
-  const menuItemReview = await prisma.menuItemReview.findFirst({
-    where: {
-      menuItem: {
-        slug,
-      },
-      user: {
-        username,
-      },
-    },
-  });
-
-  if (!menuItemReview) {
-    throw new Error(
-      "Menu item review not found or you don't have permission to update it."
-    );
-  }
-
-  return await prisma.menuItemReview.update({
-    where: {
-      id: menuItemReview.id,
-    },
-    data: {
-      rating,
-      comment,
-    },
   });
 };
 
