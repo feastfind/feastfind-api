@@ -5,12 +5,13 @@
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --hot src/index.ts",
-    "migrate": "prisma migrate dev",
-    "migrate:deploy": "prisma migrate deploy",
-    "generate": "prisma generate",
-    "seed": "prisma db seed",
-    "studio": "prisma studio",
-    "reset": "prisma migrate reset --force --skip-seed"
+    "docker:up": "docker compose up -d",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force --skip-seed"
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
