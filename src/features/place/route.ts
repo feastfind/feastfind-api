@@ -20,7 +20,7 @@ placesRoute.openapi(
         description: 'Places retrieved successfully',
         content: {
           'application/json': {
-            schema: placeSchema.GetPlaces,
+            schema: placeSchema.PlacesArray,
           },
         },
       },

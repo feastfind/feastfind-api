@@ -20,7 +20,7 @@ menuItemsRoute.openapi(
         description: 'Menu items retrieved successfully',
         content: {
           'application/json': {
-            schema: menuSchema.GetMenuItems,
+            schema: menuSchema.MenuItemsArray,
           },
         },
       },
