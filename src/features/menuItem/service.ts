@@ -3,7 +3,7 @@ import { MenuItem, MenuItemReview } from '../../../prisma/generated/zod';
 import prisma from '../../lib/db';
 import { filterValidValues } from '../../utils/filterValid';
 import { generateSlug } from '../../utils/slug';
-import { isPlaceSlugExist } from '../places/service';
+import { isPlaceSlugExist } from '../place/service';
 
 export const getMenuItems = async (): Promise<{
   menuItems: MenuItem[];
