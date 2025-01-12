@@ -56,7 +56,7 @@ app.route('/cities', citiesRoute);
 app.route('/auth', authRoute);
 app.route('/places', placesRoute);
 app.route('/menu-items', menuItemsRoute);
-app.route('/search', searchRoute);
 app.route('/menu-items', menuItemReviewsRoute);
+app.route('/search', searchRoute);
 
 export default app;

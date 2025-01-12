@@ -1,57 +1,69 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
-import { API_TAGS } from '../../config/config';
-import { MenuItemRequestParamSchema } from '../menuItem/schema';
+import prisma from '@/lib/db';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
+import { API_TAGS } from '@/config/config';
+import { handleErrorResponse } from '@/utils/handleError';
+import { PlacesArray } from '@place/schema';
+import { MenuItemWithPlace } from '@menuItem/schema';
 
 const searchRoute = new OpenAPIHono();
 
+// /search?q=keyword
 searchRoute.openapi(
   {
     method: 'get',
-    path: '',
-    description: 'Get a menu item by keyword.',
+    path: '/',
+    description: 'Search places and menu items by keyword.',
     tags: API_TAGS.SEARCH,
     request: {
-      //   params: MenuItemRequestParamSchema,
-      query: MenuItemRequestParamSchema,
+      query: z.object({
+        q: z.string().min(1),
+      }),
     },
     responses: {
       200: {
-        description: 'Menu item retrieved successfully',
-        // content: {
-        //   'application/json': {
-        //     schema: GetMenuItemsBySlugSchema,
-        //   },
-        // },
+        description: 'Search results',
+        content: {
+          'application/json': {
+            schema: z.object({
+              places: PlacesArray,
+              menuItems: MenuItemWithPlace.array(),
+            }),
+          },
+        },
       },
-      400: {
-        description: 'Invalid param',
-      },
-      404: {
-        description: 'Menu item not found',
-      },
-      500: {
-        description: 'Failed to retrieve menu item',
-      },
+      400: { description: 'Failed to search' },
+      500: { description: 'Failed to search' },
     },
   },
   async (c) => {
     try {
-      const { slug } = c.req.valid('query');
+      const { q } = c.req.valid('query');
 
-      console.log(slug);
-      //   const menuItem = await getMenuItemByParam(slug);
+      const [places, menuItems] = await Promise.all([
+        prisma.place.findMany({
+          where: {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { description: { contains: q, mode: 'insensitive' } },
+            ],
+          },
+        }),
+        prisma.menuItem.findMany({
+          where: {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { description: { contains: q, mode: 'insensitive' } },
+            ],
+          },
+          include: {
+            place: true,
+          },
+        }),
+      ]);
 
-      //   if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
-
-      //   return c.json(menuItem, 200);
-      return c.json('success', 200);
+      return c.json({ places, menuItems }, 200);
     } catch (error) {
-      return c.json('error', 500);
-      //   return handleErrorResponse(
-      //     c,
-      //     `Failed to retrieve menu item: ${error} `,
-      //     500
-      //   );
+      return handleErrorResponse(c, `Failed to search: ${error}`, 500);
     }
   }
 );

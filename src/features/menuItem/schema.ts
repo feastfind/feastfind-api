@@ -1,5 +1,6 @@
 import { MenuItemSchema } from '@prisma/generated/zod';
 import { z } from 'zod';
+import { Place } from '../place/schema';
 
 const MenuItem = MenuItemSchema.extend({
   price: z.string().refine((val) => Number(val)),
@@ -14,9 +15,13 @@ export const MenuItemResponse = z.object({
   menuItem: MenuItem,
 });
 
-export const GetMenuItems = MenuItem.array();
+export const MenuItemWithPlace = MenuItem.extend({
+  place: Place,
+});
 
-export const GetMenuItemDetail = MenuItem
+export const MenuItemsArray = MenuItem.array();
+
+export const GetMenuItemDetail = MenuItem;
 
 export const CreateMenuItem = z.object({
   name: z.string(),
