@@ -5,7 +5,6 @@ Content-Type: application/json
   "name": "mega_admin",
   "username": "megaadmin",
   "email": "megaadmin@example.com",
-  "avatarURL": "",
   "password": "megaadmin123"
 }
 HTTP 201

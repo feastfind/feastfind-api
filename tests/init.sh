@@ -24,7 +24,7 @@ else
 fi
 
 # TEST CONFIG
-TESTS_DIR="./*.hurl"
+TESTS_DIR="./integration/menuReview/*.hurl"
 
 # Clean up function
 cleanup() {

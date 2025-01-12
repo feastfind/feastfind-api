@@ -1,31 +1,10 @@
+import { API_TAGS } from '@/config/config';
+import { authenticateUser } from '@/middlewares/authenticateUser';
+import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { MenuItemSchema } from '../../../prisma/generated/zod';
-import { API_TAGS } from '../../config/config';
-import { authenticateUser } from '../../middlewares/authenticateUser';
-import { handleErrorResponse } from '../../utils/handleError';
-import {
-  CreateMenuItemReviewSchema,
-  CreateMenuItemSchema,
-  GetMenuItemReviewsBySlug,
-  GetMenuItemsBySlugSchema,
-  GetMenuItemsSchema,
-  MenuItemRequestParamSchema,
-  MenuItemResponseSchema,
-  MenuItemReviewResponseSchema,
-  UpdateMenuItemRequestBodySchema,
-  UpdateMenuItemReviewRequestBodySchema,
-} from './schema';
-import {
-  createMenuItem,
-  createMenuItemReview,
-  deleteMenuItemBySlug,
-  deleteMenuItemReviewBySlug,
-  getMenuItemByParam,
-  getMenuItemReviewsByMenuItemParam,
-  getMenuItems,
-  updateMenuItem,
-  updateMenuItemReview,
-} from './service';
+
+import * as menuSchema from '@menuItem/schema';
+import * as menuService from '@menuItem/service';
 
 const menuItemsRoute = new OpenAPIHono();
 
@@ -33,14 +12,15 @@ menuItemsRoute.openapi(
   {
     method: 'get',
     path: '/',
+    summary: 'Get all menu items',
     description: 'Get a list of menu items.',
     tags: API_TAGS.MENU_ITEM,
     responses: {
       200: {
-        description: 'Menu Items retrieved successfully',
+        description: 'Menu items retrieved successfully',
         content: {
           'application/json': {
-            schema: GetMenuItemsSchema,
+            schema: menuSchema.GetMenuItems,
           },
         },
       },
@@ -51,19 +31,13 @@ menuItemsRoute.openapi(
   },
   async (c) => {
     try {
-      const { menuItems, count } = await getMenuItems();
+      const menuItems = await menuService.getMenuItems();
 
-      return c.json(
-        {
-          count,
-          menuItems,
-        },
-        200
-      );
+      return c.json(menuItems, 200);
     } catch (error) {
       return handleErrorResponse(
         c,
-        `Failed to retrieve cities: ${error} `,
+        `Failed to retrieve menu items: ${error} `,
         500
       );
     }
@@ -74,22 +48,20 @@ menuItemsRoute.openapi(
   {
     method: 'get',
     path: '/{slug}',
-    description: 'Get a menu item by slug.',
+    summary: 'Get a menu item',
+    description: 'Get a menu item by slug or id.',
     tags: API_TAGS.MENU_ITEM,
     request: {
-      params: MenuItemRequestParamSchema,
+      params: menuSchema.MenuItemParam,
     },
     responses: {
       200: {
         description: 'Menu item retrieved successfully',
         content: {
           'application/json': {
-            schema: GetMenuItemsBySlugSchema,
+            schema: menuSchema.GetMenuItemDetail,
           },
         },
-      },
-      400: {
-        description: 'Invalid param',
       },
       404: {
         description: 'Menu item not found',
@@ -103,7 +75,7 @@ menuItemsRoute.openapi(
     try {
       const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(slug);
+      const menuItem = await menuService.getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
@@ -120,64 +92,9 @@ menuItemsRoute.openapi(
 
 menuItemsRoute.openapi(
   {
-    method: 'get',
-    path: '/{slug}/reviews',
-    description: 'Get menu item reviews by menu item slug.',
-    tags: API_TAGS.MENU_ITEM_REVIEW,
-    request: {
-      params: MenuItemRequestParamSchema,
-    },
-    responses: {
-      200: {
-        description: 'Menu item reviews retrieved successfully',
-        content: { 'application/json': { schema: GetMenuItemReviewsBySlug } },
-      },
-      400: {
-        description: 'Invalid menu param',
-      },
-      404: {
-        description: 'Menu item reviews not found',
-      },
-      500: {
-        description: 'Failed to retrieve menu item reviews',
-      },
-    },
-  },
-  async (c) => {
-    try {
-      const { slug } = c.req.valid('param');
-
-      const menuItem = await getMenuItemByParam(slug);
-
-      if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
-
-      const { menuItemReviews, count } =
-        await getMenuItemReviewsByMenuItemParam(menuItem.id);
-
-      if (!menuItemReviews)
-        return handleErrorResponse(c, 'Menu item reviews not found', 404);
-
-      return c.json(
-        {
-          count,
-          menuItemReviews,
-        },
-        200
-      );
-    } catch (error) {
-      return handleErrorResponse(
-        c,
-        `Failed to retrieve menu item reviews: ${error} `,
-        500
-      );
-    }
-  }
-);
-
-menuItemsRoute.openapi(
-  {
     method: 'post',
     path: '/',
+    summary: 'Create a menu item',
     description: 'Add a new menu item.',
     tags: API_TAGS.MENU_ITEM,
     security: [{ AuthorizationBearer: [] }],
@@ -186,15 +103,17 @@ menuItemsRoute.openapi(
       body: {
         content: {
           'application/json': {
-            schema: CreateMenuItemSchema,
+            schema: menuSchema.CreateMenuItem,
           },
         },
       },
     },
     responses: {
       201: {
-        description: 'Menu Item created successfully',
-        content: { 'application/json': { schema: MenuItemResponseSchema } },
+        description: 'Menu item created successfully',
+        content: {
+          'application/json': { schema: menuSchema.MenuItemResponse },
+        },
       },
       400: {
         description: 'Validation error',
@@ -216,7 +135,7 @@ menuItemsRoute.openapi(
 
       const username = user.username;
 
-      const menuItem = await createMenuItem(
+      const menuItem = await menuService.createMenuItem(
         name,
         price,
         description ?? '',
@@ -227,7 +146,7 @@ menuItemsRoute.openapi(
 
       return c.json(
         {
-          message: 'Menu Item created successfully',
+          message: 'Menu item created successfully',
           menuItem,
         },
         201
@@ -244,87 +163,22 @@ menuItemsRoute.openapi(
 
 menuItemsRoute.openapi(
   {
-    method: 'post',
-    path: '/{slug}/reviews',
-    description: 'Add a new menu item review.',
-    tags: API_TAGS.MENU_ITEM_REVIEW,
-    security: [{ AuthorizationBearer: [] }],
-    middleware: authenticateUser,
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: CreateMenuItemReviewSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Menu item review created successfully',
-        content: { 'application/json': { schema: MenuItemSchema } },
-      },
-      400: {
-        description: 'Validation error',
-      },
-      404: {
-        description: 'Menu item not found',
-      },
-      500: {
-        description: 'Failed to create menu item review',
-      },
-    },
-  },
-  async (c) => {
-    try {
-      const user = c.get('user');
-
-      const { menuItemId, rating, comment } = c.req.valid('json');
-
-      const menuItemReview = await createMenuItemReview(
-        menuItemId,
-        user.id,
-        rating,
-        comment ?? ''
-      );
-
-      return c.json(
-        {
-          message: 'Menu Item review created successfully',
-          menuItemReview,
-        },
-        201
-      );
-    } catch (error) {
-      return handleErrorResponse(
-        c,
-        `Failed to create menu item review: ${error} `,
-        500
-      );
-    }
-  }
-);
-
-menuItemsRoute.openapi(
-  {
     method: 'delete',
     path: '/{slug}',
-    description: 'Delete a menu item.',
+    summary: 'Delete a menu item',
+    description: 'Delete a menu item by slug.',
     tags: API_TAGS.MENU_ITEM,
     security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     request: {
-      params: MenuItemRequestParamSchema,
+      params: menuSchema.MenuItemParam,
     },
     responses: {
       200: {
         description: 'Menu item deleted successfully',
         content: {
-          'application/json': { schema: MenuItemResponseSchema },
+          'application/json': { schema: menuSchema.MenuItemResponse },
         },
-      },
-      400: {
-        description: 'Validation error',
       },
       404: {
         description: 'Menu item not found',
@@ -339,14 +193,16 @@ menuItemsRoute.openapi(
       const { username } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const menuItem = await deleteMenuItemBySlug(username, slug);
+      const menuItem = await menuService.deleteMenuItemBySlug(username, slug);
+
+      if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
       return c.json(
         {
           message: 'Menu Item deleted successfully',
           menuItem,
         },
-        201
+        200
       );
     } catch (error) {
       return handleErrorResponse(
@@ -362,24 +218,27 @@ menuItemsRoute.openapi(
   {
     method: 'patch',
     path: '/{slug}',
-    description: 'Update a menu item.',
+    summary: 'Update a menu item',
+    description: 'Update a menu item by slug.',
     tags: API_TAGS.MENU_ITEM,
     security: [{ AuthorizationBearer: [] }],
     middleware: authenticateUser,
     request: {
-      params: MenuItemRequestParamSchema,
+      params: menuSchema.MenuItemParam,
       body: {
         content: {
           'application/json': {
-            schema: UpdateMenuItemRequestBodySchema,
+            schema: menuSchema.UpdateMenuItem,
           },
         },
       },
     },
     responses: {
-      201: {
+      200: {
         description: 'Menu item updated successfully',
-        content: { 'application/json': { schema: MenuItemResponseSchema } },
+        content: {
+          'application/json': { schema: menuSchema.MenuItemResponse },
+        },
       },
       400: {
         description: 'Validation error',
@@ -400,7 +259,7 @@ menuItemsRoute.openapi(
       const { name, price, description, images, placeSlug } =
         c.req.valid('json');
 
-      const menuItem = await updateMenuItem(
+      const menuItem = await menuService.updateMenuItem(
         slug,
         username,
         name,
@@ -415,130 +274,12 @@ menuItemsRoute.openapi(
           message: 'Menu item updated successfully',
           menuItem,
         },
-        201
+        200
       );
     } catch (error) {
       return handleErrorResponse(
         c,
         `Failed to update menu item: ${error} `,
-        500
-      );
-    }
-  }
-);
-
-menuItemsRoute.openapi(
-  {
-    method: 'delete',
-    path: '/{slug}/reviews',
-    description: 'Delete a menu item review.',
-    tags: API_TAGS.MENU_ITEM_REVIEW,
-    security: [{ AuthorizationBearer: [] }],
-    middleware: authenticateUser,
-    request: {
-      params: MenuItemRequestParamSchema,
-    },
-    responses: {
-      200: {
-        description: 'Menu item review deleted successfully',
-        content: {
-          'application/json': { schema: MenuItemReviewResponseSchema },
-        },
-      },
-      400: {
-        description: 'Validation error',
-      },
-      404: {
-        description: 'Menu item review not found',
-      },
-      500: {
-        description: 'Failed to delete menu item review',
-      },
-    },
-  },
-  async (c) => {
-    try {
-      const { username } = c.get('user');
-      const { slug } = c.req.valid('param');
-
-      const menuItem = await deleteMenuItemReviewBySlug(username, slug);
-
-      return c.json(
-        {
-          message: 'Menu Item review deleted successfully',
-          menuItem,
-        },
-        201
-      );
-    } catch (error) {
-      return handleErrorResponse(
-        c,
-        `Failed to delete menu item review: ${error} `,
-        500
-      );
-    }
-  }
-);
-
-menuItemsRoute.openapi(
-  {
-    method: 'patch',
-    path: '/{slug}/reviews',
-    description: 'Update a menu item review.',
-    tags: API_TAGS.MENU_ITEM_REVIEW,
-    security: [{ AuthorizationBearer: [] }],
-    middleware: authenticateUser,
-    request: {
-      params: MenuItemRequestParamSchema,
-      body: {
-        content: {
-          'application/json': {
-            schema: UpdateMenuItemReviewRequestBodySchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Menu item review updated successfully',
-        content: { 'application/json': { schema: MenuItemResponseSchema } },
-      },
-      400: {
-        description: 'Validation error',
-      },
-      404: {
-        description: 'Menu item review not found',
-      },
-      500: {
-        description: 'Failed to update menu item review',
-      },
-    },
-  },
-  async (c) => {
-    try {
-      const { username } = c.get('user');
-      const { slug } = c.req.valid('param');
-
-      const { rating, comment } = c.req.valid('json');
-
-      const menuItem = await updateMenuItemReview(
-        slug,
-        username,
-        rating,
-        comment ?? ''
-      );
-
-      return c.json(
-        {
-          message: 'Menu item review updated successfully',
-          menuItem,
-        },
-        201
-      );
-    } catch (error) {
-      return handleErrorResponse(
-        c,
-        `Failed to update menu item review: ${error}`,
         500
       );
     }

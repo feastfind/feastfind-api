@@ -1,12 +1,9 @@
+import { API_TAGS } from '@/config/config';
+import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { API_TAGS } from '../../config/config';
-import { handleErrorResponse } from '../../utils/handleError';
-import {
-  GetCitiesBySlugRequestSchema,
-  GetCitiesBySlugSchema,
-  GetCitiesSchema,
-} from './schema';
-import { getCities, getCityByParam } from './service';
+
+import * as citySchema from '@city/schema';
+import * as cityService from '@city/service';
 
 const citiesRoute = new OpenAPIHono();
 
@@ -14,6 +11,7 @@ citiesRoute.openapi(
   {
     method: 'get',
     path: '/',
+    summary: 'Get all cities',
     description: 'Get a list of cities.',
     tags: API_TAGS.CITY,
     responses: {
@@ -21,7 +19,7 @@ citiesRoute.openapi(
         description: 'Cities retrieved successfully',
         content: {
           'application/json': {
-            schema: GetCitiesSchema,
+            schema: citySchema.GetCities,
           },
         },
       },
@@ -32,15 +30,9 @@ citiesRoute.openapi(
   },
   async (c) => {
     try {
-      const { cities, count } = await getCities();
+      const cities = await cityService.getCities();
 
-      return c.json(
-        {
-          count,
-          cities,
-        },
-        200
-      );
+      return c.json(cities, 200);
     } catch (error) {
       return handleErrorResponse(
         c,
@@ -55,18 +47,16 @@ citiesRoute.openapi(
   {
     method: 'get',
     path: '/{slug}',
-    description: 'Get a city by slug.',
+    summary: 'Get city details',
+    description: 'Get a city by slug or id.',
     tags: API_TAGS.CITY,
     request: {
-      params: GetCitiesBySlugRequestSchema,
+      params: citySchema.CityParam,
     },
     responses: {
       200: {
         description: 'City retrieved successfully',
-        content: { 'application/json': { schema: GetCitiesBySlugSchema } },
-      },
-      400: {
-        description: 'Invalid slug',
+        content: { 'application/json': { schema: citySchema.City } },
       },
       404: {
         description: 'City not found',
@@ -80,7 +70,7 @@ citiesRoute.openapi(
     try {
       const { slug } = c.req.valid('param');
 
-      const city = await getCityByParam(slug);
+      const city = await cityService.getCityByParam(slug);
 
       if (!city) return handleErrorResponse(c, 'City not found', 404);
 
