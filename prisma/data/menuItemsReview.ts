@@ -7,19 +7,105 @@ export const dataMenuItemsReview = [
       'Gak pernah gagal deh setiap kali makan Mie Aceh! Rasa pedasnya itu tuh bener-bener nendang banget, tapi tetap ada keseimbangan antara gurih dan manisnya. Apalagi kalau pakai tambahan daging kambing atau udang, makin mantap!',
   },
   {
+    menuItemSlug: 'mie-aceh-super-spesial',
+    username: 'haidar',
+    rating: 4,
+    comment:
+      'Pernah nyoba Mie Aceh di beberapa tempat, tapi yang ini rasanya paling autentik.',
+  },
+  {
+    menuItemSlug: 'mie-aceh-super-spesial',
+    username: 'nanda',
+    rating: 5,
+    comment:
+      'Buat pecinta pedas, Mie Aceh ini cocok banget. Dijamin bikin keringetan!',
+  },
+  {
+    menuItemSlug: 'mie-aceh-super-spesial',
+    username: 'obby',
+    rating: 5,
+    comment:
+      'Mie Aceh ini juara banget! Kuahnya yang kaya rempah dan dagingnya yang empuk bikin ketagihan. ',
+  },
+  {
+    menuItemSlug: 'mie-aceh-super-spesial',
+    username: 'yurik',
+    rating: 3,
+    comment:
+      'Porsi Mie Aceh di sini cukup besar, cocok untuk yang berselera besar. Sayangnya, tempatnya agak kurang nyaman karena terlalu ramai.',
+  },
+
+  {
+    menuItemSlug: 'martabak-daging',
+    username: 'haidar',
+    rating: 4,
+    comment:
+      'Martabak daging ini juara banget! Isinya melimpah, dagingnya empuk, dan bumbunya meresap sempurna. Bikin ketagihan!',
+  },
+  {
     menuItemSlug: 'martabak-daging',
     username: 'puja',
-    rating: 4,
+    rating: 5,
     comment:
       'Setiap suapan terasa kaya, apalagi dengan tambahan telur dan bawang bombay yang memberi sensasi segar dan gurih.',
   },
   {
+    menuItemSlug: 'martabak-daging',
+    username: 'nanda',
+    rating: 5,
+    comment:
+      'Buat kamu yang suka martabak dengan isian yang banyak, wajib coba martabak daging ini. Dijamin puas!',
+  },
+  {
+    menuItemSlug: 'martabak-daging',
+    username: 'yurik',
+    rating: 5,
+    comment: 'Martabak daging di sini memiliki kulit yang lembut dan renyah. ',
+  },
+  {
+    menuItemSlug: 'martabak-daging',
+    username: 'obby',
+    rating: 5,
+    comment:
+      'Isian dagingnya sangat banyak dan bumbunya kaya rasa. Cocok disantap saat masih hangat.',
+  },
+
+  {
     menuItemSlug: 'nasi-goreng-bistik',
     username: 'puja',
-    rating: 5,
+    rating: 3,
+    comment:
+      '"Nasi goreng bistiknya kurang berasa. Bumbunya kurang meresap dan rasanya cenderung hambar.',
+  },
+  {
+    menuItemSlug: 'nasi-goreng-bistik',
+    username: 'yurik',
+    rating: 4,
     comment:
       'Nasi gorengnya wangi banget, bumbunya pas, dan rasanya gurih dengan sedikit sentuhan manis. Tapi yang bikin spesial adalah potongan bistik daging sapi yang juicy dan empuk! Dagingnya nggak terlalu tebal, tapi cukup tebal untuk memberikan rasa yang kaya.',
   },
+  {
+    menuItemSlug: 'nasi-goreng-bistik',
+    username: 'haidar',
+    rating: 3,
+    comment:
+      'Bistiknya terlalu kering dan alot. Dagingnya kurang empuk dan kurang berbumbu.',
+  },
+  {
+    menuItemSlug: 'nasi-goreng-bistik',
+    username: 'nanda',
+    rating: 4,
+    comment:
+      'Nasi goreng bistiknya juara! Perpaduan yang pas antara gurihnya nasi goreng dan renyahnya bistik.',
+  },
+  {
+    menuItemSlug: 'nasi-goreng-bistik',
+    username: 'obby',
+    rating: 3,
+    comment:
+      'Porsi nasi goreng bistiknya pas banget, bikin kenyang tanpa bikin enek. Cocok banget buat makan siang atau malam.',
+  },
+
   {
     menuItemSlug: 'udang-saus-asam-manis',
     username: 'puja',
@@ -254,6 +340,34 @@ export const dataMenuItemsReview = [
     menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
     username: 'haidar',
     rating: 5,
+    comment:
+      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+  },
+  {
+    menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
+    username: 'puja',
+    rating: 4,
+    comment:
+      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+  },
+  {
+    menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
+    username: 'yurik',
+    rating: 5,
+    comment:
+      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+  },
+  {
+    menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
+    username: 'obby',
+    rating: 4,
+    comment:
+      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+  },
+  {
+    menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
+    username: 'nanda',
+    rating: 4,
     comment:
       '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
   },
