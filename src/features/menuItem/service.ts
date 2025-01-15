@@ -5,7 +5,13 @@ import { isPlaceSlugExist } from '@place/service';
 import { MenuItem } from '@prisma/generated/zod';
 
 export const getMenuItems = async (): Promise<MenuItem[]> => {
-  return await prisma.menuItem.findMany();
+  return await prisma.menuItem.findMany({
+    include: {
+      images: true,
+      place: true,
+      reviews: true,
+    },
+  });
 };
 
 export const getMenuItemByParam = async (
@@ -14,6 +20,11 @@ export const getMenuItemByParam = async (
   return await prisma.menuItem.findFirst({
     where: {
       OR: [{ id: param }, { slug: param }],
+    },
+    include: {
+      images: true,
+      place: true,
+      reviews: true,
     },
   });
 };
@@ -109,6 +120,10 @@ export const updateMenuItem = async (
         username,
       },
     },
+    include: {
+      images: true,
+      place: true,
+    },
   });
 
   if (!menuItem) {
@@ -150,9 +165,7 @@ export const updateMenuItem = async (
 
 export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
   const menuItem = await prisma.menuItem.findUnique({
-    where: {
-      slug,
-    },
+    where: { slug },
   });
 
   return menuItem !== null;

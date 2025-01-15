@@ -44,6 +44,7 @@ model Place {
   slug        String  @unique @db.VarChar(255)
   name        String  @db.VarChar(255)
   description String? @db.Text
+  // reviewScore Float   @default(0) // Example: 4,5 Aggregated from MenuItemReview.reviews
 
   priceMin Decimal @db.Money
   priceMax Decimal @db.Money
@@ -72,6 +73,7 @@ model MenuItem {
   name        String  @db.VarChar(255)
   price       Decimal @default(0) @db.Money
   description String? @db.Text
+  // reviewScore Float @default(0) // Example: 4.6
 
   images  MenuItemImage[]
   reviews MenuItemReview[]
