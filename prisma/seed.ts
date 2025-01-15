@@ -5,6 +5,7 @@ import { dataPlaces } from './data/places';
 import { dataUsers } from './data/users';
 import { dataMenuItemsReview } from './data/menuItemsReview';
 import { hashPassword } from '../src/utils/password';
+import { avgMenuItemRating, avgPlaceRating } from '@/utils/aggreateRating';
 
 const prisma = new PrismaClient();
 
@@ -143,6 +144,28 @@ async function seedMenuItemsReview() {
 
     await prisma.menuItemReview.create({
       data: menuItemReviewUpsertData,
+    });
+
+    const avgRatingOfMenuItem = await avgMenuItemRating(menuItem.id);
+
+    await prisma.menuItem.update({
+      where: {
+        id: menuItem.id,
+      },
+      data: {
+        ratingScore: avgRatingOfMenuItem,
+      },
+    });
+
+    const avgRatingOfPlace = await avgPlaceRating(menuItem.placeId);
+
+    await prisma.place.update({
+      where: {
+        id: menuItem.placeId,
+      },
+      data: {
+        ratingScore: avgRatingOfPlace,
+      },
     });
   }
 

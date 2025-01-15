@@ -170,3 +170,17 @@ export const isMenuItemSlugExist = async (slug: string): Promise<boolean> => {
 
   return menuItem !== null;
 };
+
+export const updateMenuItemRating = async (
+  menuItemId: string,
+  rating: number
+) => {
+  return await prisma.menuItem.update({
+    where: {
+      id: menuItemId,
+    },
+    data: {
+      ratingScore: rating,
+    },
+  });
+};

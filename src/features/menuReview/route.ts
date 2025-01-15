@@ -1,12 +1,14 @@
 import { API_TAGS } from '@/config/config';
 import { authenticateUser } from '@/middlewares/authenticateUser';
+import { avgMenuItemRating, avgPlaceRating } from '@/utils/aggreateRating';
 import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
-import { getMenuItemByParam } from '@menuItem/service';
+import { getMenuItemByParam, updateMenuItemRating } from '@menuItem/service';
 
 import * as reviewSchema from '@menuReview/schema';
 import * as reviewService from '@menuReview/service';
+import { updatePlaceRating } from '../place/service';
 
 const menuItemReviewsRoute = new OpenAPIHono();
 
@@ -112,6 +114,26 @@ menuItemReviewsRoute.openapi(
         rating,
         comment ?? ''
       );
+
+      // UPDATE RATING SCORE
+
+      console.log(menuItemReview);
+
+      const avgRatingOfMenuItem = await avgMenuItemRating(menuItem.id);
+
+      if (avgRatingOfMenuItem) {
+        console.log(avgRatingOfMenuItem);
+        console.log(menuItem.id);
+        await updateMenuItemRating(menuItem.id, avgRatingOfMenuItem);
+      }
+
+      const avgRatingOfPlace = await avgPlaceRating(menuItem.placeId);
+
+      if (avgRatingOfPlace) {
+        console.log(avgRatingOfPlace);
+        console.log(menuItem.placeId);
+        await updatePlaceRating(menuItem.placeId, avgRatingOfPlace);
+      }
 
       return c.json(
         {

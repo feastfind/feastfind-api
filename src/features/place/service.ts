@@ -226,3 +226,14 @@ export const isPlaceSlugExist = async (slug: string): Promise<boolean> => {
 
   return place !== null;
 };
+
+export const updatePlaceRating = async (placeId: string, rating: number) => {
+  return await prisma.place.update({
+    where: {
+      id: placeId,
+    },
+    data: {
+      ratingScore: rating,
+    },
+  });
+};
