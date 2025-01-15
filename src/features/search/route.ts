@@ -48,6 +48,7 @@ searchRoute.openapi(
               { description: { contains: q, mode: 'insensitive' } },
             ],
           },
+          include: { menuItems: { include: { images: true } } },
         }),
         prisma.menuItem.findMany({
           where: {
@@ -57,6 +58,7 @@ searchRoute.openapi(
             ],
           },
           include: {
+            images: true,
             place: true,
           },
         }),
