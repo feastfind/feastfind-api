@@ -11,4 +11,5 @@ export const API_TAGS = {
   MENU_ITEM: ['Menu Item'],
   MENU_ITEM_REVIEW: ['Menu Item Review'],
   SEARCH: ['Search'],
+  REVIEW: ['Review'],
 };
