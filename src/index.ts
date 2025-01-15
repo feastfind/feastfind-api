@@ -8,7 +8,8 @@ import { citiesRoute } from '@city/route';
 import { placesRoute } from '@place/route';
 import { usersRoute } from '@user/route';
 import { menuItemsRoute } from '@menuItem/route';
-import { searchRoute } from './features/search/route';
+import { searchRoute } from '@search/route';
+import { reviewRoute } from '@review/route';
 import { menuItemReviewsRoute } from '@menuReview/route';
 
 const app = new OpenAPIHono();
@@ -58,5 +59,6 @@ app.route('/places', placesRoute);
 app.route('/menu-items', menuItemsRoute);
 app.route('/menu-items', menuItemReviewsRoute);
 app.route('/search', searchRoute);
+app.route('/reviews', reviewRoute);
 
 export default app;

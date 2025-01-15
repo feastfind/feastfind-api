@@ -12,6 +12,7 @@ searchRoute.openapi(
   {
     method: 'get',
     path: '/',
+    summary: 'Get searched places and menu items',
     description: 'Search places and menu items by keyword.',
     tags: API_TAGS.SEARCH,
     request: {
