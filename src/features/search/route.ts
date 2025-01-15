@@ -3,7 +3,7 @@ import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { API_TAGS } from '@/config/config';
 import { handleErrorResponse } from '@/utils/handleError';
 import { PlacesArray } from '@place/schema';
-import { MenuItemWithPlace } from '@menuItem/schema';
+import { MenuItemWithRelations } from '@menuItem/schema';
 
 const searchRoute = new OpenAPIHono();
 
@@ -27,7 +27,7 @@ searchRoute.openapi(
           'application/json': {
             schema: z.object({
               places: PlacesArray,
-              menuItems: MenuItemWithPlace.array(),
+              menuItems: MenuItemWithRelations.array(),
             }),
           },
         },
