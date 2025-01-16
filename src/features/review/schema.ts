@@ -1,2 +1,18 @@
-// TODO
-// rating = min 1, 2, 3, 4, 5 max
+import {
+  MenuItemReviewSchema,
+  MenuItemSchema,
+  UserSchema,
+} from '@prisma/generated/zod';
+
+import { MenuItemImage } from '../menuItemImage/schema';
+
+const menuItemWithImageSchema = MenuItemSchema.extend({
+  images: MenuItemImage.array(),
+});
+
+export const MenuItemsReviews = MenuItemReviewSchema.extend({
+  menuItem: menuItemWithImageSchema,
+  user: UserSchema,
+});
+
+export const MenuItemsReviewsArray = MenuItemsReviews.array();

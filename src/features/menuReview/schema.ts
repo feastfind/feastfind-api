@@ -15,11 +15,11 @@ export const ReviewResponse = z.object({
 export const GetReviews = Review.array();
 
 export const CreateReview = z.object({
-  rating: z.number(),
+  rating: z.number().min(1).max(5),
   comment: z.string().optional(),
 });
 
 export const UpdateReview = z.object({
-  rating: z.number().optional(),
+  rating: z.number().min(1).max(5).optional(),
   comment: z.string().optional(),
 });

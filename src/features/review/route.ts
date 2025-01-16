@@ -3,6 +3,7 @@ import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
 import * as reviewService from '@review/service';
+import { MenuItemsReviewsArray } from './schema';
 
 const reviewRoute = new OpenAPIHono();
 
@@ -16,13 +17,13 @@ reviewRoute.openapi(
     responses: {
       200: {
         description: 'Reviews retrieved successfully',
-        // content: {
-        //   'application/json': {
-        //     // schema: placeSchema.PlacesArray,
-        //   },
-        // },
+        content: {
+          'application/json': {
+            schema: MenuItemsReviewsArray,
+          },
+        },
       },
-      400: { description: 'Failed to search' },
+      400: { description: 'Failed to reviews' },
       500: {
         description: 'Failed to retrieve reviews',
       },
