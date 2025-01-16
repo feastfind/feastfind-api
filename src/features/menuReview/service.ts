@@ -1,7 +1,9 @@
 import prisma from '@/lib/db';
 import { MenuItemReview } from '@prisma/generated/zod';
 
-export const getReviews = async (menuItemId: string): Promise<MenuItemReview[]> => {
+export const getReviews = async (
+  menuItemId: string
+): Promise<MenuItemReview[]> => {
   return await prisma.menuItemReview.findMany({
     where: {
       menuItemId,
@@ -36,7 +38,7 @@ export const deleteReview = async (
       user: {
         id: userId,
       },
-    }
+    },
   });
 
   if (!menuItemReview) {
@@ -66,7 +68,7 @@ export const updateReview = async (
       user: {
         id: userId,
       },
-    }
+    },
   });
 
   if (!menuItemReview) {

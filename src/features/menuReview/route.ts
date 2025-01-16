@@ -117,8 +117,6 @@ menuItemReviewsRoute.openapi(
 
       // UPDATE RATING SCORE
 
-      console.log(menuItemReview);
-
       const avgRatingOfMenuItem = await avgMenuItemRating(menuItem.id);
 
       if (avgRatingOfMenuItem) {
@@ -189,6 +187,16 @@ menuItemReviewsRoute.openapi(
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
       const review = await reviewService.deleteReview(menuItem.id, id);
+
+      const avgRatingOfMenuItem = await avgMenuItemRating(menuItem.id);
+      if (avgRatingOfMenuItem) {
+        await updateMenuItemRating(menuItem.id, avgRatingOfMenuItem);
+      }
+
+      const avgRatingOfPlace = await avgPlaceRating(menuItem.placeId);
+      if (avgRatingOfPlace) {
+        await updatePlaceRating(menuItem.placeId, avgRatingOfPlace);
+      }
 
       return c.json(
         {
