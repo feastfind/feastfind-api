@@ -1,4 +1,4 @@
-import { API_TAGS } from '@/config/config';
+import { API_TAGS } from '@/config';
 import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
 

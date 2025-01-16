@@ -1,6 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { API_TAGS } from '../../config/config';
-import { handleErrorResponse } from '../../utils/handleError';
+import { API_TAGS } from '@/config';
+import { handleErrorResponse } from '@/utils/handleError';
 
 import * as userSchema from '@user/schema';
 import * as userService from '@user/service';

@@ -6,6 +6,7 @@
     "start": "bun run src/index.ts",
     "dev": "bun run --hot src/index.ts",
     "docker:up": "docker compose up -d",
+    "optimize-images": "bun prisma/optimizeImages.ts",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@uploadcare/upload-client": "^6.14.2",
     "prettier-plugin-prisma": "^5.0.0",
     "prisma": "^6.0.1",
     "zod-prisma-types": "^3.2.1"
