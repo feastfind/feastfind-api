@@ -1,10 +1,23 @@
-import { MenuItemSchema } from '@prisma/generated/zod';
+import {
+  MenuItemImageSchema,
+  MenuItemReviewSchema,
+  MenuItemSchema,
+  PlaceSchema,
+  UserSchema,
+} from '@prisma/generated/zod';
 import { z } from 'zod';
 import { Place } from '../place/schema';
 import { MenuItemImage } from '../menuItemImage/schema';
 
+const ReviewSchema = MenuItemReviewSchema.extend({
+  user: UserSchema,
+});
+
 const MenuItem = MenuItemSchema.extend({
   price: z.string().refine((val) => Number(val)),
+  images: MenuItemImageSchema.array(),
+  reviews: ReviewSchema.array(),
+  place: PlaceSchema,
 });
 
 export const MenuItemParam = z.object({
