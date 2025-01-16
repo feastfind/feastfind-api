@@ -24,7 +24,11 @@ export const getMenuItemByParam = async (
     include: {
       images: true,
       place: true,
-      reviews: true,
+      reviews: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 };
