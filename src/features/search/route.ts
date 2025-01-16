@@ -1,9 +1,9 @@
+import { API_TAGS } from '@/config';
 import prisma from '@/lib/db';
-import { OpenAPIHono, z } from '@hono/zod-openapi';
-import { API_TAGS } from '@/config/config';
 import { handleErrorResponse } from '@/utils/handleError';
-import { PlacesArray } from '@place/schema';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { MenuItemWithRelations } from '@menuItem/schema';
+import { PlacesArray } from '@place/schema';
 
 const searchRoute = new OpenAPIHono();
 

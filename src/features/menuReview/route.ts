@@ -1,4 +1,4 @@
-import { API_TAGS } from '@/config/config';
+import { API_TAGS } from '@/config';
 import { authenticateUser } from '@/middlewares/authenticateUser';
 import { avgMenuItemRating, avgPlaceRating } from '@/utils/aggreateRating';
 import { handleErrorResponse } from '@/utils/handleError';
