@@ -1,6 +1,7 @@
 import {
   MenuItemReviewSchema,
   MenuItemSchema,
+  PlaceSchema,
   UserSchema,
 } from '@prisma/generated/zod';
 
@@ -13,6 +14,7 @@ const menuItemWithImageSchema = MenuItemSchema.extend({
 export const MenuItemsReviews = MenuItemReviewSchema.extend({
   menuItem: menuItemWithImageSchema,
   user: UserSchema,
+  place: PlaceSchema,
 });
 
 export const MenuItemsReviewsArray = MenuItemsReviews.array();
