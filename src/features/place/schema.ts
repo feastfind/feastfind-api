@@ -1,4 +1,4 @@
-import { MenuItemSchema, PlaceSchema } from '@prisma/generated/zod';
+import { CitySchema, MenuItemSchema, PlaceSchema } from '@prisma/generated/zod';
 import { z } from 'zod';
 
 const Price = z.string().refine((val) => Number(val));
@@ -24,6 +24,7 @@ export const PlaceResponse = z.object({
 export const PlacesArray = PlaceWithImages.array();
 
 export const GetPlaceDetail = PlaceSchema.extend({
+  city: CitySchema,
   menuItems: MenuItemSchema.extend({
     images: z.string().array(),
   }).array(),

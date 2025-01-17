@@ -35,6 +35,7 @@ export const getPlaceByParam = async (
       OR: [{ id: param }, { slug: param }],
     },
     include: {
+      city: true,
       menuItems: {
         include: {
           images: true,

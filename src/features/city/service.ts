@@ -10,6 +10,9 @@ export const getCityByParam = async (param: string): Promise<City | null> => {
     where: {
       OR: [{ slug: param }, { id: param }],
     },
+    include: {
+      places: true,
+    },
   });
 };
 
