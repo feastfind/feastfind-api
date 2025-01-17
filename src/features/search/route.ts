@@ -4,6 +4,7 @@ import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { MenuItemWithRelations } from '@menuItem/schema';
 import { PlacesArray } from '@place/schema';
+import { SearchResponseSchema } from './schema';
 
 const searchRoute = new OpenAPIHono();
 
@@ -25,10 +26,7 @@ searchRoute.openapi(
         description: 'Search results',
         content: {
           'application/json': {
-            schema: z.object({
-              places: PlacesArray,
-              menuItems: MenuItemWithRelations.array(),
-            }),
+            schema: SearchResponseSchema,
           },
         },
       },
