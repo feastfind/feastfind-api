@@ -1,7 +1,7 @@
 import { API_TAGS } from '@/config';
 import { authenticateUser } from '@/middlewares/authenticateUser';
 import { handleErrorResponse } from '@/utils/handleError';
-import { OpenAPIHono } from '@hono/zod-openapi';
+import { OpenAPIHono, z } from '@hono/zod-openapi';
 
 import * as placeSchema from '@place/schema';
 import * as placeService from '@place/service';
@@ -15,6 +15,11 @@ placesRoute.openapi(
     summary: 'Get all places',
     description: 'Get a list of places.',
     tags: API_TAGS.PLACE,
+    request: {
+      query: z.object({
+        page: z.string().optional(),
+      }),
+    },
     responses: {
       200: {
         description: 'Places retrieved successfully',
@@ -31,7 +36,8 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const places = await placeService.getPlaces();
+      const { page } = c.req.valid('query');
+      const places = await placeService.getPlaces(page);
 
       return c.json(places, 200);
     } catch (error) {
