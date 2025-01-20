@@ -12,9 +12,16 @@ interface PlaceWithMenuItems extends Place {
   menuItems: MenuItem[];
 }
 
-export const getPlaces = async (): Promise<PlaceWithImages[]> => {
+export const getPlaces = async (
+  page?: string | undefined
+): Promise<PlaceWithImages[]> => {
+  const takeItem = 20;
+  const skipItem = page ? Number(page) * takeItem - takeItem : 0;
+
   const places = await prisma.place.findMany({
     include: { menuItems: { select: { images: true } } },
+    skip: skipItem,
+    take: takeItem,
   });
 
   const placesWithImages = places.map(({ menuItems, ...rest }) => ({
