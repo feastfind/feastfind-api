@@ -11,6 +11,9 @@ export const getReviews = async (page?: string | undefined) => {
     },
     skip: skipItem,
     take: takeItem,
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   return reviews;
