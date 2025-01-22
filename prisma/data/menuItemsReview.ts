@@ -341,7 +341,7 @@ export const dataMenuItemsReview = [
     username: 'haidar',
     rating: 5,
     comment:
-      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+      'Tempatnya nyaman dan pelayanannya ramah. Selain makanannya yang enak, suasana tempat makan juga berpengaruh besar pada pengalaman kuliner. Semoga tempat yang menyajikan nasi tempong ini nyaman dan pelayanannya ramah.',
   },
   {
     menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
@@ -355,20 +355,20 @@ export const dataMenuItemsReview = [
     username: 'yurik',
     rating: 5,
     comment:
-      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+      'Nasi tempong, makanan khas Banyuwangi yang wajib dicoba. Sebagai pecinta kuliner Indonesia, saya sangat tertarik untuk mencoba nasi tempong. Dengar-dengar rasanya sangat autentik dan bikin ketagihan.',
   },
   {
     menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
     username: 'obby',
     rating: 4,
     comment:
-      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+      'Perpaduan rasa yang unik dan bikin ketagihan. Kombinasi sayuran segar, lauk pauk yang beragam, dan sambal yang nampol membuat nasi tempong jadi hidangan yang sangat istimewa. Rasanya bikin nagih!',
   },
   {
     menuItemSlug: 'nasi-tempong-ikan-lele-goreng-spesial',
     username: 'nanda',
     rating: 4,
     comment:
-      '"Nasi tempongnya mantap banget! Pedasnya bikin nagih, ikan lelenya garing di luar lembut di dalam. Perpaduan yang pas!',
+      'Penasaran dengan sensasi pedasnya! Nasi tempong ini terlihat sangat menggugah selera, apalagi dengan sambalnya yang super pedas. Pasti bikin keringetan! ️',
   },
 ];
