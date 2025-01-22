@@ -25,9 +25,8 @@ export const getMenuItemByParam = async (
       images: true,
       place: true,
       reviews: {
-        include: {
-          user: true,
-        },
+        include: { user: true },
+        orderBy: { createdAt: 'desc' },
       },
     },
   });

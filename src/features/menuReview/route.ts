@@ -4,7 +4,7 @@ import { avgMenuItemRating, avgPlaceRating } from '@/utils/aggreateRating';
 import { handleErrorResponse } from '@/utils/handleError';
 import { OpenAPIHono } from '@hono/zod-openapi';
 
-import { getMenuItemByParam, updateMenuItemRating } from '@menuItem/service';
+import * as menuItemService from '@menuItem/service';
 
 import * as reviewSchema from '@menuReview/schema';
 import * as reviewService from '@menuReview/service';
@@ -39,7 +39,7 @@ menuItemReviewsRoute.openapi(
     try {
       const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(slug);
+      const menuItem = await menuItemService.getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
@@ -102,7 +102,7 @@ menuItemReviewsRoute.openapi(
       const { id } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(slug);
+      const menuItem = await menuItemService.getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
@@ -122,7 +122,10 @@ menuItemReviewsRoute.openapi(
       if (avgRatingOfMenuItem) {
         console.log(avgRatingOfMenuItem);
         console.log(menuItem.id);
-        await updateMenuItemRating(menuItem.id, avgRatingOfMenuItem);
+        await menuItemService.updateMenuItemRating(
+          menuItem.id,
+          avgRatingOfMenuItem
+        );
       }
 
       const avgRatingOfPlace = await avgPlaceRating(menuItem.placeId);
@@ -182,7 +185,7 @@ menuItemReviewsRoute.openapi(
       const { id } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(slug);
+      const menuItem = await menuItemService.getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
@@ -190,7 +193,10 @@ menuItemReviewsRoute.openapi(
 
       const avgRatingOfMenuItem = await avgMenuItemRating(menuItem.id);
       if (avgRatingOfMenuItem) {
-        await updateMenuItemRating(menuItem.id, avgRatingOfMenuItem);
+        await menuItemService.updateMenuItemRating(
+          menuItem.id,
+          avgRatingOfMenuItem
+        );
       }
 
       const avgRatingOfPlace = await avgPlaceRating(menuItem.placeId);
@@ -257,7 +263,7 @@ menuItemReviewsRoute.openapi(
       const { id } = c.get('user');
       const { slug } = c.req.valid('param');
 
-      const menuItem = await getMenuItemByParam(slug);
+      const menuItem = await menuItemService.getMenuItemByParam(slug);
 
       if (!menuItem) return handleErrorResponse(c, 'Menu item not found', 404);
 
