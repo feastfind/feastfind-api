@@ -16,7 +16,7 @@ reviewRoute.openapi(
     tags: API_TAGS.REVIEW,
     request: {
       query: z.object({
-        popularity: z.string().optional(),
+        rating: z.string().optional(),
         page: z.string().optional(),
       }),
     },
@@ -37,15 +37,15 @@ reviewRoute.openapi(
   },
   async (c) => {
     try {
-      const { popularity, page } = c.req.valid('query');
+      const { rating, page } = c.req.valid('query');
 
-      if (popularity === 'highest') {
+      if (rating === 'highest') {
         const reviews = await reviewService.getHighestReviews(page);
 
         return c.json(reviews, 200);
       }
 
-      if (popularity === 'lowest') {
+      if (rating === 'lowest') {
         const reviews = await reviewService.getLowestReviews(page);
         return c.json(reviews, 200);
       }
