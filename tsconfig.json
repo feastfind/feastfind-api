@@ -15,6 +15,7 @@
       "@menuReview/*": ["src/features/menuReview/*"],
       "@search/*": ["src/features/search/*"],
       "@review/*": ["src/features/review/*"],
+      "@userPlace/*": ["src/features/userPlace/*"],
       "@auth/*": ["src/features/auth/*"],
       "@prisma/*": ["prisma/*"]
     }

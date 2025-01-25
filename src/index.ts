@@ -11,6 +11,7 @@ import { menuItemsRoute } from '@menuItem/route';
 import { searchRoute } from '@search/route';
 import { reviewRoute } from '@review/route';
 import { menuItemReviewsRoute } from '@menuReview/route';
+import { userPlaceRoute } from '@userPlace/route';
 
 const app = new OpenAPIHono();
 
@@ -60,5 +61,6 @@ app.route('/menu-items', menuItemsRoute);
 app.route('/menu-items', menuItemReviewsRoute);
 app.route('/search', searchRoute);
 app.route('/reviews', reviewRoute);
+app.route('/userPlace', userPlaceRoute);
 
 export default app;
