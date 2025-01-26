@@ -11,6 +11,9 @@ export const getMenuItems = async (): Promise<MenuItem[]> => {
       place: true,
       reviews: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 };
 

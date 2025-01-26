@@ -2,7 +2,11 @@ import { City } from '@prisma/generated/zod';
 import prisma from '@/lib/db';
 
 export const getCities = async (): Promise<City[]> => {
-  return await prisma.city.findMany();
+  return await prisma.city.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 };
 
 export const getCityByParam = async (param: string): Promise<City | null> => {

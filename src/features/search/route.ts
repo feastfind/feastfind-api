@@ -47,6 +47,9 @@ searchRoute.openapi(
             ],
           },
           include: { menuItems: { include: { images: true } } },
+          orderBy: {
+            createdAt: 'desc',
+          },
         }),
         prisma.menuItem.findMany({
           where: {
@@ -58,6 +61,9 @@ searchRoute.openapi(
           include: {
             images: true,
             place: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
         }),
       ]);

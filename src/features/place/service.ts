@@ -22,6 +22,9 @@ export const getPlaces = async (
     include: { menuItems: { select: { images: true } } },
     skip: skipItem,
     take: takeItem,
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
   const placesWithImages = places.map(({ menuItems, ...rest }) => ({
@@ -46,6 +49,9 @@ export const getPlaceByParam = async (
       menuItems: {
         include: {
           images: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       },
     },

@@ -8,6 +8,9 @@ export const getReviews = async (
     where: {
       menuItemId,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 };
 

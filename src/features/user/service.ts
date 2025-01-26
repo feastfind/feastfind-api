@@ -2,7 +2,11 @@ import prisma from '@/lib/db';
 import { User } from '@prisma/generated/zod';
 
 export const getAllUsers = async (): Promise<User[]> => {
-  return await prisma.user.findMany();
+  return await prisma.user.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 };
 
 export const getUserByParam = async (param: string): Promise<User | null> => {
