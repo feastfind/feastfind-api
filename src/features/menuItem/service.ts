@@ -25,7 +25,11 @@ export const getMenuItemByParam = async (
       OR: [{ id: param }, { slug: param }],
     },
     include: {
-      images: true,
+      images: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
       place: true,
       reviews: {
         include: { user: true },
@@ -142,7 +146,7 @@ export const updateMenuItem = async (
     name,
     price,
     description,
-    placeSlug,
+    // placeSlug,
   });
 
   // TODO: updating images will require separate services, it also depends on how the frontend works
@@ -153,19 +157,17 @@ export const updateMenuItem = async (
 
     await prisma.menuItem.update({
       where: { id: menuItem.id },
-      data: {
-        images: {
-          createMany: {
-            data: imageUrls,
-          },
-        },
-      },
+      data,
     });
   }
 
   return await prisma.menuItem.update({
     where: { id: menuItem.id },
-    data,
+    data: {
+      name,
+      price,
+      description,
+    },
   });
 };
 
