@@ -157,7 +157,13 @@ export const updateMenuItem = async (
 
     await prisma.menuItem.update({
       where: { id: menuItem.id },
-      data,
+      data: {
+        images: {
+          createMany: {
+            data: imageUrls,
+          },
+        },
+      },
     });
   }
 
