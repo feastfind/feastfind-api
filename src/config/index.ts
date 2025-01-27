@@ -12,6 +12,7 @@ export const API_TAGS = {
   PLACE: ['Place'],
   USER_PLACE: ['UserPlace'],
   MENU_ITEM: ['Menu Item'],
+  MENU_ITEM_IMAGES_REVIEW: ['Menu Item Images'],
   MENU_ITEM_REVIEW: ['Menu Item Review'],
   SEARCH: ['Search'],
   REVIEW: ['Review'],
