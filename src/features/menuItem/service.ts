@@ -177,11 +177,7 @@ export const updateMenuItem = async (
 
   return await prisma.menuItem.update({
     where: { id: menuItem.id },
-    data: {
-      name,
-      price,
-      description,
-    },
+    data,
   });
 };
 
