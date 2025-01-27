@@ -12,6 +12,7 @@
       "@place/*": ["src/features/place/*"],
       "@city/*": ["src/features/city/*"],
       "@menuItem/*": ["src/features/menuItem/*"],
+      "@menuItemImages/*": ["src/features/menuItemImages/*"],
       "@menuReview/*": ["src/features/menuReview/*"],
       "@search/*": ["src/features/search/*"],
       "@review/*": ["src/features/review/*"],

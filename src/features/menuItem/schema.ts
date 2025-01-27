@@ -7,7 +7,6 @@ import {
 } from '@prisma/generated/zod';
 import { z } from 'zod';
 import { Place } from '../place/schema';
-import { MenuItemImage } from '../menuItemImage/schema';
 
 const ReviewSchema = MenuItemReviewSchema.extend({
   user: UserSchema,

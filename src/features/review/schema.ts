@@ -5,7 +5,7 @@ import {
   UserSchema,
 } from '@prisma/generated/zod';
 
-import { MenuItemImage } from '../menuItemImage/schema';
+import { MenuItemImage } from '../menuItemImages/schema';
 
 const menuItemWithImageSchema = MenuItemSchema.extend({
   images: MenuItemImage.array(),
