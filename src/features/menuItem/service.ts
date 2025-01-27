@@ -7,9 +7,17 @@ import { MenuItem } from '@prisma/generated/zod';
 export const getMenuItems = async (): Promise<MenuItem[]> => {
   return await prisma.menuItem.findMany({
     include: {
-      images: true,
+      images: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
       place: true,
-      reviews: true,
+      reviews: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',

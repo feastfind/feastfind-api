@@ -19,7 +19,9 @@ export const getPlaces = async (
   const skipItem = page ? Number(page) * takeItem - takeItem : 0;
 
   const places = await prisma.place.findMany({
-    include: { menuItems: { select: { images: true } } },
+    include: {
+      menuItems: { select: { images: { orderBy: { createdAt: 'desc' } } } },
+    },
     skip: skipItem,
     take: takeItem,
     orderBy: {
@@ -48,7 +50,11 @@ export const getPlaceByParam = async (
       city: true,
       menuItems: {
         include: {
-          images: true,
+          images: {
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',

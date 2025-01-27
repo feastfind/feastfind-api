@@ -6,7 +6,9 @@ export const getReviews = async (page?: string | undefined) => {
   const skipItem = page ? Number(page) * takeItem - takeItem : 0;
   const reviews = await prisma.menuItemReview.findMany({
     include: {
-      menuItem: { include: { images: true, place: true } },
+      menuItem: {
+        include: { images: { orderBy: { createdAt: 'desc' } }, place: true },
+      },
       user: true,
     },
     skip: skipItem,
@@ -26,7 +28,9 @@ const findManyMenuItemReview = async (
 ) => {
   return await prisma.menuItemReview.findMany({
     include: {
-      menuItem: { include: { images: true, place: true } },
+      menuItem: {
+        include: { images: { orderBy: { createdAt: 'desc' } }, place: true },
+      },
       user: true,
     },
     skip: skipItem,

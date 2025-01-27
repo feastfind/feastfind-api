@@ -15,9 +15,21 @@ export const getUserByParam = async (param: string): Promise<User | null> => {
       OR: [{ id: param }, { email: param }, { username: param }],
     },
     include: {
-      places: true,
-      menuItems: true,
-      menuItemReview: true,
+      places: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+      menuItems: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+      menuItemReview: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   });
 };

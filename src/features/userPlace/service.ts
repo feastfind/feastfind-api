@@ -20,7 +20,9 @@ export const getUserPlaces = async (
     where: {
       userId: userId,
     },
-    include: { menuItems: { select: { images: true } } },
+    include: {
+      menuItems: { select: { images: { orderBy: { createdAt: 'desc' } } } },
+    },
     skip: skipItem,
     take: takeItem,
     orderBy: {

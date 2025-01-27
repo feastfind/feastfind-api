@@ -46,7 +46,11 @@ searchRoute.openapi(
               { description: { contains: q, mode: 'insensitive' } },
             ],
           },
-          include: { menuItems: { include: { images: true } } },
+          include: {
+            menuItems: {
+              include: { images: { orderBy: { createdAt: 'desc' } } },
+            },
+          },
           orderBy: {
             createdAt: 'desc',
           },
@@ -59,7 +63,11 @@ searchRoute.openapi(
             ],
           },
           include: {
-            images: true,
+            images: {
+              orderBy: {
+                createdAt: 'desc',
+              },
+            },
             place: true,
           },
           orderBy: {
