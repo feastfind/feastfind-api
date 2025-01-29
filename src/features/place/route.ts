@@ -17,7 +17,8 @@ placesRoute.openapi(
     tags: API_TAGS.PLACE,
     request: {
       query: z.object({
-        page: z.string().optional(),
+        // page: z.string().optional(),
+        limit: z.string().optional(),
       }),
     },
     responses: {
@@ -36,8 +37,11 @@ placesRoute.openapi(
   },
   async (c) => {
     try {
-      const { page } = c.req.valid('query');
-      const places = await placeService.getPlaces(page);
+      // const { limit } = c.req.valid('query');
+      // const places = await placeService.getPlaces(limit);
+
+      const { limit } = c.req.valid('query');
+      const places = await placeService.getPlaces(limit);
 
       return c.json(places, 200);
     } catch (error) {
