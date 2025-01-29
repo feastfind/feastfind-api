@@ -17,7 +17,8 @@ reviewRoute.openapi(
     request: {
       query: z.object({
         rating: z.string().optional(),
-        page: z.string().optional(),
+        // page: z.string().optional(),
+        limit: z.string().optional(),
       }),
     },
     responses: {
@@ -37,20 +38,21 @@ reviewRoute.openapi(
   },
   async (c) => {
     try {
-      const { rating, page } = c.req.valid('query');
+      // const { rating, page } = c.req.valid('query');
+      const { rating, limit } = c.req.valid('query');
 
       if (rating === 'highest') {
-        const reviews = await reviewService.getHighestReviews(page);
+        const reviews = await reviewService.getHighestReviews(limit);
 
         return c.json(reviews, 200);
       }
 
       if (rating === 'lowest') {
-        const reviews = await reviewService.getLowestReviews(page);
+        const reviews = await reviewService.getLowestReviews(limit);
         return c.json(reviews, 200);
       }
 
-      const reviews = await reviewService.getReviews(page);
+      const reviews = await reviewService.getReviews(limit);
       return c.json(reviews, 200);
     } catch (error) {
       return handleErrorResponse(

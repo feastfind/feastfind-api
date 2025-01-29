@@ -2,8 +2,9 @@ import prisma from '@/lib/db';
 
 const takeItem = 10;
 
-export const getReviews = async (page?: string | undefined) => {
-  const skipItem = page ? Number(page) * takeItem - takeItem : 0;
+export const getReviews = async (limit?: string | undefined) => {
+  // const skipItem = page ? Number(page) * takeItem - takeItem : 0;
+  const skipItem = limit ? Number(limit) * takeItem - takeItem : 0;
   const reviews = await prisma.menuItemReview.findMany({
     include: {
       menuItem: {
@@ -11,8 +12,9 @@ export const getReviews = async (page?: string | undefined) => {
       },
       user: true,
     },
-    skip: skipItem,
-    take: takeItem,
+    // skip: skipItem,
+    // take: takeItem,
+    take: limit ? Number(limit) : 20,
     orderBy: {
       createdAt: 'desc',
     },
@@ -22,9 +24,9 @@ export const getReviews = async (page?: string | undefined) => {
 };
 
 const findManyMenuItemReview = async (
-  takeItem: number,
-  skipItem: number,
+  limit: string | undefined,
   order: 'desc' | 'asc'
+  // skipItem: number,
 ) => {
   return await prisma.menuItemReview.findMany({
     include: {
@@ -33,24 +35,24 @@ const findManyMenuItemReview = async (
       },
       user: true,
     },
-    skip: skipItem,
-    take: takeItem,
+    // skip: skipItem,
+    take: limit ? Number(limit) : 20,
     orderBy: {
       rating: order,
     },
   });
 };
 
-export const getHighestReviews = async (page?: string | undefined) => {
-  const skipItem = page ? Number(page) * takeItem - takeItem : 0;
+export const getHighestReviews = async (limit?: string | undefined) => {
+  // const skipItem = page ? Number(page) * takeItem - takeItem : 0;
 
-  const reviews = findManyMenuItemReview(takeItem, skipItem, 'desc');
+  const reviews = findManyMenuItemReview(limit, 'desc');
   return reviews;
 };
 
-export const getLowestReviews = async (page?: string | undefined) => {
-  const skipItem = page ? Number(page) * takeItem - takeItem : 0;
+export const getLowestReviews = async (limit?: string | undefined) => {
+  // const skipItem = page ? Number(page) * takeItem - takeItem : 0;
 
-  const reviews = findManyMenuItemReview(takeItem, skipItem, 'asc');
+  const reviews = findManyMenuItemReview(limit, 'asc');
   return reviews;
 };
