@@ -52,8 +52,8 @@ export const dataPlaces = [
     citySlug: 'surabaya',
     address:
       'Jl. Jagir Wonokromo Wetan No.10, Jagir, Kec. Wonokromo, Surabaya, Jawa Timur 60244',
-    latitude: -7.301111884047268,
-    longitude: 112.73917395662413,
+    latitude: -7.3013194,
+    longitude: 112.7380367,
     username: 'admin',
   },
   {
@@ -209,8 +209,8 @@ export const dataPlaces = [
     citySlug: 'bandung',
     address:
       'Jl. Soekarno-Hatta No.88, Wr. Muncang, Kec. Bandung Kulon, Kota Bandung, Jawa Barat 40211',
-    latitude: -6.946593673881793,
-    longitude: 107.63808566004869,
+    latitude: -6.9281396,
+    longitude: 107.5764032,
     username: 'admin',
   },
 
